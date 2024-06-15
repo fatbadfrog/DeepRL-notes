@@ -1,0 +1,39 @@
+\documentclass[10pt]{article}
+\usepackage{NotesTeXV3}
+
+\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
+\definecolor{myblue}{rgb}{0.10,0.11,0.8}
+\definecolor{myred}{rgb}{0.74,0.1,0.05}
+\definecolor{mygreen}{rgb}{0.,0.52,0.32}
+\definecolor{myyellow}{rgb}{0.96,0.92,0.13}
+\definecolor{myorange}{rgb}{0.7,0.41,0.1}
+\definecolor{mypurple}{rgb}{0.51,0.02,.8}
+\definecolor{mygray}{rgb}{0.6,0.6,0.6}
+\renewcommand\emph[2][myred]{{\bfseries \textcolor{#1}{#2}}}
+\newcommand{\fm}[1]{\tikzmark{#1}}
+
+\usepackage[ruled,linesnumbered]{algorithm2e}
+\usetikzlibrary{graphs,quotes,positioning,fit,backgrounds,tikzmark,calc,arrows.meta}
+
+\usepackage{booktabs,array}
+
+\begin{document}
+    \title{Note for \texttt{Deep Reinoforcement Learing}}
+    \author{Wang Hui}
+    \affiliation{Amateur Marchine Learning Researcher in NUDT}
+	\emailAdd{wanghuichn1234@gmail.com}
+	\maketitle
+
+    \newpage
+
+    \pagestyle{fancynotes}
+    \include{part-1.tex}
+    \newpage
+
+    \include{part-2.tex}
+    \newpage
+
+    \include{part-3.tex}
+    \newpage
+\end{document}

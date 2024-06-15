@@ -1,0 +1,170 @@
+\part{Balancing immediate and long-term goals}
+    This is about the basic algorithm for solving MDPs. It is a technique called \emph{dynamic programming}, includes \emph[myred]{Value Iteration (VI)} and \emph[myred]{Policy Iteration (PI)}. \par
+    Although VI and PI require full access to the MDP, like knowing the dynamics of the environment, which is in some cheating way, they are the foundations from which virtually every other RL algorithm originates.
+
+    \section{Policy}
+    Solid plan can not account for stochastic environment. What agent needs to come up with is called \emph{policy}. Comparing with a plan, \emph{policy} has a action for all possible states (only states in the plan have a action).\par
+    \emph{Policies} can be stochastic (return action-probability distribution) or deterministic (return single actions for a given state). A policy is a function that prescribes actions to take for a given non-terminal state.
+    Now, one immediate question is:{\itshape how good is a policy?}
+
+    \section{State-value function: What to expect from here?}
+    If we are given a policy and the MDP, we should be able to calculate the expected return staring from every single state. That is, a number should be put into every state in the MDP for a given policy. The number must tell agent whether a state is better than another and precisely how much better it is. \par
+    Remember that the value of states depends on the policy which the agent follows. We define the value of states as the expectation of returns that the agent would get if it follows the policy $\pi$. 
+    \begin{definition}[State-value function]
+        \begin{equation}
+            V_{\pi}(s)=E[G_t|S_t=s]
+        \end{equation}
+        Considering the recursive definition of returns, the value of states can be rewrite as:
+
+        \begin{equation}
+            V_{\pi}(s)=E[R_{t+1}+\gamma G_{t+1}|S_t=s]
+        \end{equation}
+    \end{definition}
+
+    and this will derive famous Bellman Equation.
+
+    \begin{equation}
+        V_{\pi}(s)=\sum_{a}\pi(a|s)[\sum_{r}rP(r|s,a)+\gamma\sum_{s'}V_{\pi}(s')P(s'|s,a)] \quad\forall s,s' \in S 
+    \end{equation}
+    We can use margin probability to rewrite equation above, because
+    \begin{equation}
+        P(r|s,a) = \sum_{s'}P(r,s'|s,a) \quad P(s'|s,a) = \sum_{r}P(r,s'|s,a)
+    \end{equation}
+    Then
+    \begin{equation}\label{vs1}
+        V_{\pi}(s)=\sum_{a}\pi(a|s)\sum_{r}\sum_{s'}P(r,s'|s,a)[r+\gamma V_{\pi}(s')] \quad\forall s,s' \in S
+    \end{equation}
+
+    \begin{definition}[Bellman Equation]\label{def:BellmanEquation}
+       We start from here:
+       \begin{equation*} 
+            V_{\pi}(s)=E[R_{t+1}+\gamma G_{t+1}|S_t=s]
+       \end{equation*}
+       According to expectation definition and properties:
+
+       \begin{equation*}
+            V_{\pi}(s)=E[R_{t+1}|S_t=s]+\gamma E[G_{t+1}|S_t=s]
+       \end{equation*}
+       The first item on equation right side can be expand as (according to Law of Total Probability\mn{If $B_{1}, B_{2}, \cdots$ form a partition of the sample space S, then we can calculate the probability of event A as:
+       \begin{equation*}
+        P(A)=\sum_{B_i}P(A|B_i)P(B_i)
+        \end{equation*}}):
+       \begin{align}\label{eq:bell1}
+            E[R_{t+1}|S_t=s] & = \sum_{r}rP(r|s) \notag \\
+                             & = \sum_{r}r(\sum_{a}\pi(a|s)P(r|s,a)) 
+       \end{align}
+       For simplicity, we write $S_{t}=s, A_{t}=a$ as $s, a$.
+       The second item on equation right side can be expand as (according to Properties of Expectation\mn{
+        \begin{align*}
+            E[X] & = \sum_{y}E[X|Y=y]P(y) \\
+            E[X] & = E[E[X|Y]]
+        \end{align*}})
+
+       \begin{align}\label{eq:bell2}
+            E[G_{t+1}|S_{t}=s] & = \sum_{s'}E[G_{t+1}|S_{t}=s, S_{t+1}=s']P(S_{t+1}=s'|S_{t}=s) \notag \\
+                               & = \sum_{s'}E[G_{t+1}|S_{t+1}=s']P(s'|s) \ (Markov\ Property) \notag \\
+                               & = \sum_{s'}V_{\pi}(s')\sum_{a}\pi(a|s)P(s'|s,a) \ (Law\ of\ Total\ Probability)
+       \end{align}
+       We combine equation (\ref{eq:bell1}) and (\ref{eq:bell2}), then get Bellman Equation.
+
+       \begin{equation*}
+            V_{\pi}(s)=\sum_{a}\pi(a|s)\left[\sum_{r}rP(r|s,a)+\gamma\sum_{s'}V_{\pi}(s')P(s'|s,a)\right] \quad\forall s,s' \in S
+       \end{equation*}
+    \end{definition}
+
+    \begin{proof}[Properties of Expectation]
+        \begin{align*}
+            E[X] & = \sum_{x}xP(x) \\
+                 & = \sum_{x}\sum_{y}xP(x|Y=y)P(y) \\
+                 & = \sum_{y}P(y)\sum_{x}xP(x|Y=y) \\
+                 & = \sum_{y}E[X|Y=y]P(y)
+        \end{align*}
+        For $E[X] = E[E[X|Y]]$, we can use above euqation:
+        \begin{align*}
+            E[X] & = \sum_{y}E[X|Y=y]P(y) \\
+                 & = E[E[X|Y]] \quad (\text{Definition of Expectation})
+        \end{align*}
+
+    \end{proof}
+    \section{Action-value function: What should I expect from here if I do this action?}
+    Another important question is the value of taking action $a$ in a state $s$. By comparing \emph[myblue]{two actions under the same policy}, we can use \emph[myred]{action-value function} to select a better one and then improve our policy. \\
+    \emph[myred]{Action-value function} can be defined as:
+    \begin{definition}[Action-value function]
+        \begin{equation}
+            q_{\pi}(s,a)=E[G_{t}|S_t=s, A_t=a]
+        \end{equation}
+    \end{definition}
+    We expand right side (use recursive definition of Retrun and Properties of Expectation):
+    \begin{align*}
+        E[G_t|S_t=s, A_t=a] & = \sum_rrP(r|s,a) + \gamma \sum_{s'}E[G_{t+1}|s,a,s']P(s'|s,a) \\
+                            & = \sum_rrP(r|s,a) + \gamma \sum_{s'}E[G_{t+1}|s']P(s'|s,a) \\
+                            & = \sum_rrP(r|s,a) + \gamma \sum_{s'}V_{\pi}(s')P(s'|s,a)
+    \end{align*}
+    By comparing with eq(\ref{vs1}), we have
+    \begin{equation}\label{qa1}
+        q_{\pi}(s,a)= \sum_rrP(r|s,a) + \gamma \sum_{s'}V_{\pi}(s')P(s'|s,a)
+    \end{equation}
+    and
+    \begin{equation}\label{vs2}
+        V_{\pi}(s)=\sum_{a}\pi(a|s)q_{\pi}(s,a)
+    \end{equation} 
+
+    \section{Optimal Policy}
+    An optimal policy is an policy that for every state $s$ can obtain expectation returns \emph[myblue]{greater than or equal to any other policy.} Now, an \emph[myred]{Optimal State-value function} of state $s$ and \emph[myred]{Optimal action-value function} in state $s$ of action $a$ can be defined as: 
+    \begin{align*}
+        V_*(s)=\max_{\pi}V_{\pi}(s) \\
+        q_*(s,a)=\max_{\pi}q_{\pi}(s,a)
+    \end{align*}       
+    According to eq(\ref{vs1}), the Optimal State-value funciton can be defined as:
+    \begin{definition}[Optimal State-value function]
+        \begin{align}\label{ov1}
+            V_*(s) & = \max_{\pi}V_{\pi}(s) \notag \\
+                & = \max_{\pi}\sum_{a}\pi(a|s)\sum_{s'}\sum_{r}P(s',r|s,a)[r+\gamma V_{\pi}(s')]
+        \end{align}    
+    \end{definition}
+    
+    According to equation above, Optimal State-value function of state is determined by selecting an optimal policy that makes $\sum_{a}\pi(a|s)\sum_{s'}\sum_{r}P(s',r|s,a)[r+\gamma V_{\pi}(s')]$ maximum (this is the meaning of $\max_{\pi}$). Because $\pi$ is an optimal policy,  $V_{\pi}(s')=V_*(s')$. Then we should \emph{clarify what action should be in an optimal policy}. In any states $s$, there must exist an action that maximizes $\sum_{s'}\sum_{r}P(s',r|s,a)[r+\gamma V_*(s')]$. Since $\sum_{a}\pi(a|s)=1$, we have:
+
+    \begin{align*}
+        &\quad \sum_{a}\pi (a|s)\sum_{s'}\sum_{r}P(s',r|s,a)[r+\gamma V_*(s')] \\
+        & \le \sum_{a}\pi (a|s)\max_{a} \sum_{s'}\sum_{r}P(s',r|s,a)[r+\gamma V_*(s')]\\
+        & = \max_{a}\sum_{s'}\sum_{r}P(s',r|s,a)[r+\gamma V_*(s')]
+    \end{align*}
+
+    Now, we have the optimal policy $\pi^{*}(a|s)$,
+    
+    \begin{equation}\label{op1}
+        \pi^*(a|s)=\left\{
+                         \begin{array}{rl}
+                            1 & \text{if } a=a^*, \\
+                            0 & \text{if } a\ne a^*.
+                         \end{array} \right.
+    \end{equation}
+
+    here $a^*= \mathop{\arg \max}\limits_{a}\sum_{s'}\sum_{r}P(s',r|s,a)[r+\gamma V_*(s')]$. So we rewrite eq (\ref{ov1})as below:
+
+    \begin{equation}\label{ov2}
+        V_*(s) = \max_{a}\sum_{s'}\sum_{r}P(s',r|s,a)[r+\gamma V_{*}(s')] 
+    \end{equation}
+
+    And according to eq.(\ref{qa1})and (\ref{vs2})
+    \begin{align}
+        q_{\pi}(s,a) & = \sum_rrP(r|s,a) + \gamma \sum_{s'}V_{\pi}(s')P(s'|s,a) \notag \\
+                     & = \sum_rrP(r|s,a) + \gamma \sum_{s'}\sum_{a'}\pi (a'|s') q_{\pi}(s',a')P(s'|s,a) \notag \\
+                     & = \sum_r\sum_{s'}rP(r,s'|s,a) + \gamma \sum_{r}\sum_{s'}\left [\sum_{a'}\pi
+                    (a'|s')q_{\pi}(s',a')P(r,s'|s,a)\right ] \notag \\
+                    & = \sum_r\sum_{s'}P(r,s'|s,a)\left [r+\gamma \sum_{a'}\pi (a'|s')q_{\pi}(s',a')\right ]
+    \end{align}
+
+    So Optimal Action-value function can be defined as:
+
+    \begin{definition}[Optimal Action-value function]
+        \begin{align}\label{oq1}
+            q_*(s,a) & = \max_{\pi}q_{\pi}(s,a) \notag \\
+                     & = \max_{\pi}\sum_r\sum_{s'}P(r,s'|s,a)\left [r+\gamma \sum_{a'}\pi (a'|s')q_{\pi}(s',a')\right ] \notag \\
+                     & = \sum_r\sum_{s'}P(r,s'|s,a)\left [r+\gamma \max_{a'}q_*(s',a')\right ]
+        \end{align}       
+    \end{definition}
+    
+    So far, we have defined the equation for Optimal State-value function and Optimal Action-value function. They are also the objectives we are after. We can start exploring the methods for finding these objectives.
+     
