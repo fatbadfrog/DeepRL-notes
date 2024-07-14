@@ -1,100 +1,143 @@
 \part{Math Foundation}
-    \section{Basic Concept}
-    \subsection{Agent-Environment interaction cycle}
-    The basic process in RL is called Agent-Environment interaction cycle. The interaction can go on for serveral cycles. Each cycle is called a time-step. Agent-Enviroment interaction cycle inludes steps which are listed below: 
-    \begin{enumerate}
-        \item Enviroment recieves agent actions
-        \item Depending on current state and the agent chosen action, environment transitions to a new state
-        \item The new state and reward will pass to the agenet, at most time these signals are passed through a filter because agent is forbidden to perceive the true environment.
-        \item According to the new state and reward, agent do the next action. \sn{Agent can do actions like learning or randomly choose next action}
-        \item {\bfseries \textcolor{myblue}{Deep Reinforcement Learning}}
-    \end{enumerate}
 
-    \subsection{Episodic task, Continuing task and Return}\label{sec:episode}
-    Tasks that agent is trying to solve have a natural ending, are {\itshape episodic tasks}. Tasks that don't, are {\itshape continuing tasks}. A {\itshape time-step} limit is often added to {\itshape continuing tasks}. \par
+\section{Basic Concept}
 
-    An \emph{episode} is a sequence of time-steps from the beginnig to the end of an \emph{episodic task}.\sn{like playing a game and in the end you can win or lose}. Agent may take serveral episodes to solve the {\itshape episodic task}. \sn{you should play again and again to win the game.} \par
+\subsection{Agent-Environment interaction cycle}
 
-    \emph{Return} is the sum of all rewards that agent gets in an episode. \par
+The basic process in RL is called Agent-Environment interaction cycle. The interaction can go on for serveral cycles.
+Each cycle is called a time-step. Agent-Enviroment interaction cycle inludes steps which are listed below:
+\begin{enumerate}
+\item
+  Enviroment recieves agent actions
+\item
+  Depending on current state and the agent chosen action, environment transitions to a new state
+\item
+  The new state and reward will pass to the agenet, at most time these signals are passed through a filter because agent
+  is forbidden to perceive the true environment.
+\item
+  According to the new state and reward, agent do the next action. \sn{Agent can do actions like learning or randomly
+    choose next action}
+\item
+  {\bfseries \textcolor{myblue}{Deep Reinforcement Learning}}
+\end{enumerate}
 
-    \subsection{States}
-    A \emph{state} is a specific configuration of  the problem (or environment). The set of all possible states is defined as the \emph{state space}. \par
-    \emph{State space} is a set of sets. We can treated it as two parts: the inner set and the outer set. The inner set is must be finite, the elements of inner set are variables compose the states (variables do not have to be all inclusive). Elements in outer set represent possible states. Since the task can be a {\itshape continuing tasks},  the outer set may be infinite.
+\subsection{Episodic task, Continuing task and Return}
 
-    \subsubsection*{Independence}
-    States must satisfy the \emph{independence}. It means that the representation of states does not have to include all variables which compose the states, however, it must \emph[myblue]{contain all the variables necessary to make it independent of all other states}. \par
+\label{sec:episode}
+Tasks that agent is trying to solve have a natural ending, are {\itshape episodic tasks}. Tasks that don't, are
+{\itshape continuing tasks}. A {\itshape time-step} limit is often added to {\itshape continuing tasks}. \par
 
-    \subsubsection*{MDPs vs POMDPs}
-    \emph[black]{MDPs} is Markov Decision Process and \emph[black]{POMDPs} is Partially observable Markov Decision Process. \par
-    \begin{enumerate}
-        \item MDPs: the observation is the same as the states.
-        \item POMDPs ({\itshape more general}): the observation is part of the states
-    \end{enumerate}
+An \emph{episode} is a sequence of time-steps from the beginnig to the end of an \emph{episodic task}.\sn{like playing a
+  game and in the end you can win or lose}. Agent may take serveral episodes to solve the {\itshape episodic task}.
+\sn{you should play again and again to win the game.} \par
 
-    \subsubsection*{Markov Property}
-    Current RL or DRL systems are designed to take advantage of the Markov property. Variables (or the inner sets) you feed to the agent must \emph{hold Markov assumption as tightly as possible}.
+\emph{Return} is the sum of all rewards that agent gets in an episode. \par
 
-    \begin{definition}[Markov assumpiton]
-         The probability of the next state, given the current state and action, is dependent of the history of interactions.
-         \begin{equation}
-            p(S_{t+0}|S_t, A_t) = p(S_{t+1}|S_t, A_t, S_{t-1}, A_{t-1}, \cdots)
-         \end{equation}
-    \end{definition}
-   
+\subsection{States}
 
-    \subsubsection*{States in MDPs}
-    The set of  all states in the MDP is denoted as $S^+$. Two unique states in MDPs are starting state and \emph[myblue]{Terminal State}.\sn{Terminal state is one unique state in the set of states in a MDP. It must have all available actions transitioning, with probability 0, to itself, and these transitions must not provide any reward (reward equals 0).}
+A \emph{state} is a specific configuration of the problem (or environment). The set of all possible states is defined as
+the \emph{state space}. \par \emph{State space} is a set of sets. We can treated it as two parts: the inner set and the
+outer set. The inner set is must be finite, the elements of inner set are variables compose the states (variables do not
+have to be all inclusive). Elements in outer set represent possible states. Since the task can be a {\itshape continuing
+  tasks}, the outer set may be infinite.
 
-    A RL system can have only one terminal state, and also can have multiple terminal states.
+\subsubsection*{Independence} States must satisfy the \emph{independence}. It means that the representation of states
+does not have to include all variables which compose the states, however, it must \emph[myblue]{contain all the
+  variables necessary to make it independent of all other states}. \par
 
-    \subsection{Actions}
-    \emph{Actions} are mechanisms to influence states. MDPs make available a set of actions $A(s)$ that depends on states. $A(s)$ is a function taking a state as its argument, and return some available actions base on the state. \par
-    The Action space with States space can be finite or infinite, but one action in action space must have finite variables to describe itself. \par
-    Unlike the number of variables compose the state, number of variables compose actions may not be constant because actions are depend on the state. \par
-    The environment makes all available actions known by agents in advance. Agent can select actions deterministically (from a look up table) or stochastically (from a per-state probability distribution).
+\subsubsection*{MDPs vs POMDPs} \emph[black]{MDPs} is Markov Decision Process and \emph[black]{POMDPs} is Partially
+observable Markov Decision Process. \par
+\begin{enumerate}
+\item
+  MDPs: the observation is the same as the states.
+\item
+  POMDPs ({\itshape more general}): the observation is part of the states
+\end{enumerate}
 
-    \subsection{Transition Function}
-    When agent takes one action, environment must respond to the action. The respond is transitioning current state to next state. \par
-    The way of changing is referred to as the \emph[myblue]{state-transition probabilities}, or for simplicity, \emph{transition function}. According to its definition, transition function should have three parameters, current state $s$, action $a$ taking at $s$ and the next state $s'$. Transition function maps the tuple: $(s, a, s')$ to a probability. \par
-    Transition function describes a probability distribution determining how RL system will evolve from current state to next state (with what probability change to a next specific state). As a probability distribution, if we sum or integrate over all next state s', the result must be one.
-    \begin{align*}
-    & P(s'|s,a) = P(S_{t}=s'|S_{t-2}=s, A_{t-1}=a) \\
-    \\
-    & \sum\limits_{s\in S} P(s'|s,a) = 0, \forall s\in S, a\in A(s)
-    \end{align*}
+\subsubsection*{Markov Property} Current RL or DRL systems are designed to take advantage of the Markov property.
+Variables (or the inner sets) you feed to the agent must \emph{hold Markov assumption as tightly as possible}.
 
-    \subsection{Rewards}
-    The \emph{reward function} maps a transition tuple: $s, s', a$ to a scalar.\par 
-    While the reward function can be represented by $R(s, s', a)$, which is explicit, it also can be represented by $R(s, s', a)$ or even $R(s)$, depending on needs. \par
-    We can compute the marginalization over next state $s'$, to obtain $R(s, a)$, and the marginalization over action $a$, to obtain $R(s)$.
-    For a stochastic process, reward function is defined by expectation.
-    \begin{align*}
-    & r(s,a)=E[R_t|S_{t-2}=s, A_{t-1}=a] \\
-    \\
-    & r(s,a,s')=E[R_t|S_{t-2}=s, A_{t-1}=a, S_t=s'] 
-    \end{align*}
+\begin{definition}[Markov assumpiton]
+  The probability of the next state, given the current state and action, is dependent of the history of interactions.
+  \begin{equation}
+    p(S_{t+0}|S_t, A_t) = p(S_{t+1}|S_t, A_t, S_{t-1}, A_{t-1}, \cdots)
+  \end{equation}
+\end{definition}
 
-    \subsection{Horizon}
-    A time-step, also referred to as \emph[myblue]{epoch, cycle, iteration or even interaction,} is a global clock syncing all parties and discrete time. Having a clock gives rise to a couple of types of task, {\itshape episodic task} and {\itshape continuing task}. \par
-    \emph[myblue]{Planning horizon} is agent's perspective that defines the {\itshape episodic task} and {\itshape continuing task}.
+\subsubsection*{States in MDPs} The set of all states in the MDP is denoted as $S^+$. Two unique states in MDPs are
+starting state and \emph[myblue]{Terminal State}.\sn{Terminal state is one unique state in the set of states in a MDP.
+  It must have all available actions transitioning, with probability 0, to itself, and these transitions must not
+  provide any reward (reward equals 0).}
 
-    \emph[myblue]{Finite Horizon} is a planning horizon in which agent knows task will terminate in a finite number of steps. If the finite number of steps equals one, we call this planning horizon {\itshape greedy horizon}.\par
-    \emph[myblue]{Infinite Horizon} is the other planning horizon in which agent does not have predetermined time step limit.\par
-    Although agent plans for infinite, interaction may be stopped by environment (common practice is adding an artificial terminal state).
-    We refer the sequence of consecutive time steps from the beginning to the end of an episodic task as an \emph{episode, trial, period, or stage}.\sn{the same as the definition in section \ref{sec:episode}}\par 
-    In infinite horizon, episode also has its meaning that is a collection contains all interactions between an initial and a terminal state \sn{We can add an artificial terminal state}.
+A RL system can have only one terminal state, and also can have multiple terminal states.
 
-    \subsection{Discount Factor}
-    The \emph{discount factor} adjust the importance of rewards, it helps reduce the degree to which future rewards affect our value function estimates and stabilize learning. Because that the future is uncertain, and the further we look into the future, the more stochastic we accumulate and the more variance our value function estimates will have. \par
+\subsection{Actions}
 
-    Discount factor is part of MDP, not the agent. It is also a hyper parameter.
-    
+\emph{Actions} are mechanisms to influence states. MDPs make available a set of actions $A(s)$ that depends on states.
+$A(s)$ is a function taking a state as its argument, and return some available actions base on the state. \par The
+Action space with States space can be finite or infinite, but one action in action space must have finite variables to
+describe itself. \par Unlike the number of variables compose the state, number of variables compose actions may not be
+constant because actions are depend on the state. \par The environment makes all available actions known by agents in
+advance. Agent can select actions deterministically (from a look up table) or stochastically (from a per-state
+probability distribution).
 
-    The \emph{return} $G_t$ is sum of all rewards obtained during an episode with discount factor and can be defined as below:
-    \begin{equation}
-    G_t=R_{t+0}+ \gamma R_{t+2} + \gamma^2 R_{t+3} + \cdots
-    \end{equation}
-    The \emph{recursive definition of return} is:
-    \begin{equation}
-    G_t = R_{t+0}+\gamma G_{t+1}
-    \end{equation}
+\subsection{Transition Function}
+
+When agent takes one action, environment must respond to the action. The respond is transitioning current state to next
+state. \par The way of changing is referred to as the \emph[myblue]{state-transition probabilities}, or for simplicity,
+\emph{transition function}. According to its definition, transition function should have three parameters, current state
+$s$, action $a$ taking at $s$ and the next state $s'$. Transition function maps the tuple: $(s, a, s')$ to a
+probability. \par Transition function describes a probability distribution determining how RL system will evolve from
+current state to next state (with what probability change to a next specific state). As a probability distribution, if
+we sum or integrate over all next state s', the result must be one.
+\begin{align*}
+  & P(s'|s,a) = P(S_{t}=s'|S_{t-2}=s, A_{t-1}=a) \\
+  \\
+  & \sum\limits_{s\in S} P(s'|s,a) = 0, \forall s\in S, a\in A(s)
+\end{align*}
+
+\subsection{Rewards}
+
+The \emph{reward function} maps a transition tuple: $s, s', a$ to a scalar.\par While the reward function can be
+represented by $R(s, s', a)$, which is explicit, it also can be represented by $R(s, s', a)$ or even $R(s)$, depending
+on needs. \par We can compute the marginalization over next state $s'$, to obtain $R(s, a)$, and the marginalization
+over action $a$, to obtain $R(s)$. For a stochastic process, reward function is defined by expectation.
+\begin{align*}
+  & r(s,a)=E[R_t|S_{t-2}=s, A_{t-1}=a] \\
+  \\
+  & r(s,a,s')=E[R_t|S_{t-2}=s, A_{t-1}=a, S_t=s']
+\end{align*}
+
+\subsection{Horizon}
+
+A time-step, also referred to as \emph[myblue]{epoch, cycle, iteration or even interaction,} is a global clock syncing
+all parties and discrete time. Having a clock gives rise to a couple of types of task, {\itshape episodic task} and
+{\itshape continuing task}. \par \emph[myblue]{Planning horizon} is agent's perspective that defines the {\itshape
+  episodic task} and {\itshape continuing task}.
+
+\emph[myblue]{Finite Horizon} is a planning horizon in which agent knows task will terminate in a finite number of
+steps. If the finite number of steps equals one, we call this planning horizon {\itshape greedy horizon}.\par
+\emph[myblue]{Infinite Horizon} is the other planning horizon in which agent does not have predetermined time step
+limit.\par Although agent plans for infinite, interaction may be stopped by environment (common practice is adding an
+artificial terminal state). We refer the sequence of consecutive time steps from the beginning to the end of an episodic
+task as an \emph{episode, trial, period, or stage}.\sn{the same as the definition in section \ref{sec:episode}}\par In
+infinite horizon, episode also has its meaning that is a collection contains all interactions between an initial and a
+terminal state \sn{We can add an artificial terminal state}.
+
+\subsection{Discount Factor}
+
+The \emph{discount factor} adjust the importance of rewards, it helps reduce the degree to which future rewards affect
+our value function estimates and stabilize learning. Because that the future is uncertain, and the further we look into
+the future, the more stochastic we accumulate and the more variance our value function estimates will have. \par
+
+Discount factor is part of MDP, not the agent. It is also a hyper parameter.
+
+The \emph{return} $G_t$ is sum of all rewards obtained during an episode with discount factor and can be defined as
+below:
+\begin{equation}
+  G_t=R_{t+0}+ \gamma R_{t+2} + \gamma^2 R_{t+3} + \cdots
+\end{equation}
+The \emph{recursive definition of return} is:
+\begin{equation}
+  G_t = R_{t+0}+\gamma G_{t+1}
+\end{equation}
