@@ -1,0 +1,192 @@
+\part{Monte Carlo Methods}
+Optimal policies based on a system model can be obtained by solving the optimal Bellman equation. This chapter introduces model-free algorithms
+that do not presume system models. \par
+The key point is how to learn from data which can be observed from system rather than a model. The simplest example of learning from data is
+mean estimation problem. Now we demonstrate the differences between model-based and model-free methods. Consider a random variable X. If we
+know the probability distribution of X, then the mean of X can be directly calculated based on the definition of the expected value
+(model-based approach):
+\begin{equation*}
+	E[X] = \sum_{x}p(x)x
+\end{equation*}
+When the probability distribution is unknown, and we have some samples $\{x_{1},x_{2},\cdots,x_{n}\}$, the mean can be approximated as:
+\begin{equation}\label{form:5-1}
+	E[X] \approx \overline{x} =\frac{1}{n}\sum_{j=1}^{n}x_{j}
+\end{equation}
+When n is small, the estimation may not be accurate. However, as n increase, the estimation will approach the actual expectation. The
+correctness is guaranteed by Law of large numbers (\ref{thm:5-1}).
+\begin{theorem}[Law of large numbers]\label{thm:5-1}
+	For a random variable X, suppose that ${x_{n}}^{n}_{i=1}$ are i.i.d (the abbreviation of independent identically distribution) samples. Lets $\overline{x}=\frac{1}{n}\sum_{i=1}^{n} x_{i}$ be the average of the samples. Then
+	\begin{align*}
+		E[\overline{x}]   & = E[X]              \\
+		var[\overline{x}] & = \frac{1}{n}var[X]
+	\end{align*}
+\end{theorem}
+Law of large numbers show that $\overline{x}$ is an unbiased estimate of $E[X]$, and its variance decreases to zero as n increases to infinity. \par
+
+\section{MC Basics: The simplest MC-based algorithm}
+This algorithm is obtained by replacing the model-based policy evaluation step with a model-free MC estimation step. There are two steps in
+every iteration of the policy iteration algorithm. The first step is policy evaluation, which aims to evaluate $v_{\pi_{k}}$ by solving
+$v_{\pi_{k}}=r_{\pi_{k}}+\gamma P_{\pi_{k}}v_{\pi_{k}}$. The second step is policy improvement, which aims to evaluate the greedy policy
+$\pi_{k+1} = \mathop{\arg \max}_{\pi}(r_{\pi}+\gamma P_{\pi}v_{\pi_{k}})$. The elementwise form of policy improvement step is:
+\begin{align*}
+	\pi_{k+1} & = \mathop{\arg \max}_{\pi} \sum_{a} \pi(a|s)\big[ \sum_{r}p(r|s,a)r + \gamma \sum_{s'}p(s'|s,a)v_{\pi_{k}}(s')) \big] \\
+	          & = \mathop{\arg \max}_{\pi}\sum_{a} \pi(a|s) \colorbox{mygreen!20!white}{$q_{\pi_{k}}(s,a)$} \quad  s \in S
+\end{align*}
+
+Action value functions can be calculated in two crucial steps. In the first step, value functions are determined for the purpose of calculating
+action-value functions. In the second step, action-value functions are employed to select an optimal policy. Here are two methods for
+calculating action-value functions:
+
+\begin{enumerate}
+
+	\item Model-based approach. This approach is adopted by the policy iteration algorithm. First, we obtain the value function by solving the Bellman
+	      equation. Next, we calculate the action-value function using the equation below:
+	      \begin{equation*}
+		      q_{\pi_{k}}=\sum_{r}p(r|s,a)r+\gamma \sum_{s'}p(s'|s,a)v_{\pi_{k}}
+	      \end{equation*}
+
+	\item Model-free approach. Recall the definition of action-value function:
+	      \begin{align*}
+		      q_{\pi_{k}} & = E[G_{t}|s,a]                                           \\
+		                  & = E[R_{t+1}+\gamma R_{t+2}+\gamma^{2}R_{t+3},\cdots|s,a]
+	      \end{align*}
+	      According to equation (\ref{form:5-1}), the action-value function represents an expected reward of actions (a) given a state (s). We can approximate this function using Monte Carlo (MC) methods. The agent interacts with the system from state (s) and action (a), following policy $\pi_{k}$. Assuming n episodes, the returns received in each episode are denoted as $g_{\pi_{k}}^{(i)}(s, a)$. Consequently, the estimated action-value function can be calculated as:
+	      \begin{align*}
+		      q_{\pi_{k}} & = E[G_{t}|s,a]                                          \\
+		                  & \approx \frac{1}{n}\sum_{i=1}^{n}g_{\pi_{k}}^{(i)}(s,a)
+	      \end{align*}
+	      This is the fundamental idea of MC-based method.
+\end{enumerate}
+
+\subsection{The basic MC algorithm}
+Starting from an initial policy $\pi_{0}$, the algorithm has two steps in the kth iteration:
+\begin{enumerate}
+
+	\item Step 1: policy evaluation. In this step, the algorithm estimate $q_{\pi_{k}}(s,a)$ for \emph{all (s,a)}. Specifically, for every (s,a), we
+	      collect sufficient many episodes and use the average of returns denoted as $q_{k}(s,a)$ to approximate $q_{\pi_{k}}(s,a)$.
+	\item Step 2: policy update. Policy is updated in this step by solving $\pi_{k+1}$ for all $s \in S$. The greedy optimal policy is
+	      $\pi_{k+1}(a^{*}|s)=1$ where $a^{*}=\mathop{\arg\max}_{a}=q_{k}(s,a)$.
+\end{enumerate}
+This algorithm is similar to the policy iteration algorithm, but unlike the latter, basic Monte Carlo (MC) algorithm \emph{directly estimates action-value functions} without requiring a value function $v_{\pi\_k}$. \par
+
+Since policy iteration algorithms converge, MC algorithms also converge. With sufficient episodes, the average return approximates the
+action-value function accurately. In practice, however, we don't usually need an excessive number of episodes for every state-action pair, and
+the estimation may not be very accurate. Nonetheless, the algorithm still functions, similar to truncated policy iteration methods.
+\begin{algorithm}
+	\caption{MC basic Policy Iteration Algorithm}
+	\KwIn {Initial guess $\pi_{0}$}
+	\KwOut {Search for the optimal policy}.
+	\For {kth iteration ($k=1,2,3,\cdots$)}{
+		\For {every state s}{
+			\For {every action $a \in \mathcal{A}(s)$}{
+				Collect sufficient many episodes staring from (s,a) by following policy $\pi_{k}$. \\
+				\tcc {Policy evaluation}
+				$q_{\pi_{k}}(s,a) \approx q_{k}(s,a)$ (the average return from all the episodes staring from (s,a)). \\
+
+			}
+			\tcc {Policy improvement}
+			$a^{*}_{k}=\mathop{\arg \max}_aq_k(s,a)$
+			$\pi_{k+1}(a|s)=1 \ \text{if} \ a=a_k^* \text{,} \ \text{and} \ \pi_{k+1}(a|s)=0, \text{otherwise}$
+		}}
+\end{algorithm}
+
+\subsection{MC exploring stars}
+MC basic algorithm has too low sample efficiency (many same state-action pair are calculated in different episodes). The key point of improving
+MC basic algorithm is to \emph{use samples efficiently}. Suppose that we have an episode following a policy $\pi$
+\begin{equation*}
+	s_{1} \stackrel{a_{2}}{\longrightarrow} s_{2} \stackrel{a_{4}}{\longrightarrow} s_{1} \stackrel{a_{2}}{\longrightarrow} s_{2} \stackrel{a_{3}}{\longrightarrow} s_{5} \stackrel{a_{1}}{\longrightarrow} \cdots
+\end{equation*}
+Every time a state-action pair appears in an episode, it is referred to as a \emph[myblue]{visit} of that state-action pair. If the MC basic algorithm only uses the episode return to estimate the action-value function, and only the starting state-action pair, which is $(s_{1}, a_{2})$ in this episode, can obtain an estimation of the action-value function, then this strategy is referred to as the initial visit strategy which is not sample efficient. \par
+For the purpose of improving sample efficiency, we can decompose this episode into many multiple subepisodes:
+\begin{align*}
+	 &  & s_{1} \stackrel{a_{2}}{\longrightarrow} s_{2} \stackrel{a_{4}}{\longrightarrow} s_{1} \stackrel{a_{2}}{\longrightarrow} s_{2} \stackrel{a_{3}}{\longrightarrow} s_{5} \stackrel{a_{1}}{\longrightarrow} \cdots &  & \  & \text{origin episode}                          \\
+	 &  & s_{2} \stackrel{a_{4}}{\longrightarrow} s_{1} \stackrel{a_{2}}{\longrightarrow} s_{2} \stackrel{a_{3}}{\longrightarrow} s_{5} \stackrel{a_{1}}{\longrightarrow} \cdots                                         &  & \  & \text{subepisode starting from } (s_{2},a_{4}) \\
+	 &  & s_{1} \stackrel{a_{2}}{\longrightarrow} s_{2} \stackrel{a_{3}}{\longrightarrow} s_{5} \stackrel{a_{1}}{\longrightarrow} \cdots                                                                                 &  & \  & \text{subepisode starting from } (s_{1},a_{2}) \\
+	 &  & s_{2} \stackrel{a_{3}}{\longrightarrow} s_{5} \stackrel{a_{1}}{\longrightarrow} \cdots                                                                                                                         &  & \  & \text{subepisode starting from } (s_{2},a_{3}) \\
+	 &  & s_{5} \stackrel{a_{1}}{\longrightarrow} \cdots                                                                                                                                                                 &  & \  & \text{subepisode starting from } (s_{5},a_{1})
+\end{align*}
+If we regard these subepisodes as distinct from the original one and employ the initial visit strategy, more accurate action value functions can be estimated. It's essential to note that for the same state-action pair, it may be visited in various subepisodes (for instance, $(s_{1},a_{2})$). If only the first visit of this state-action pair is considered, the strategy is referred to as the first visit strategy. Conversely, if every visit of this state-action pair is taken into account, the strategy is known as the every visit strategy. \par
+
+In practice, we don't need to decompose original episodes into different subepisodes nor apply the initial visit strategy for each one.
+Instead, we can compute returns from back to front in the original episodes, achieving action-value functions for all state-action pairs in a
+single traversal. The detailed algorithm is presented below:
+
+\begin{algorithm}
+	\caption{MC Exploring Starts}
+	\KwIn {Initial policy $\pi_{0}(a|s)$ and initial value $q(s,a)$ for all $(s,a)$. $Returns(s,a)=0$ and $Num(s,a)=0$ for all $(s,a)$}
+	\KwOut {Search for an optimal policy}
+	\While {Policy is not convergent}{
+	Episode generation: Select a staring state-action pair $(s_{0},a_{0})$ and ensure all pairs can be possibly selected \emph{exploring-starts condition}. \par
+	Following the current policy, generate an episode of length T: $s_{0},a_{0},r_{1},\cdots,s_{T-1},a_{T-1},r_{T}$. \par
+	\For {every episode}{
+	$g \gets 0$ \par
+	\For {each step of the episode, $t=T-1,T-2,\cdots,1,0,$}{
+	$g \gets \gamma g+r_{t+1}$ \par
+	\tcc {every visit strategy}
+	$Returns(s_{t},a_{t}) \gets Returns(s_{t},a_{t})+g$ \par
+	$Num(s_{t},a_{t}) \gets Num(s_{t},a_{t})+1$ \par
+	\tcc {Policy evaluation}
+	$q(s_{t},a_{t}) \gets Returns(s_{t}, a_{t})/Num(s_{t},a_{t})$ \par
+	\tcc {Policy improvement}
+	$\pi(a|s_{t})=1 \text{ if } a=\mathop{\arg \max}_{a}q(s_{t},a)$, otherwise, $\pi(a|s_{t})=0$
+
+	}}}
+\end{algorithm}
+
+\emph{Exploring-starts condition} requires every staring state-action pair should have sufficient many episodes. Only if every state-action pair is well explored can the accurate action-value function be estimated. However, meeting this condition is difficult in many applications, particularly those involving physical interactions with environments. $\epsilon-$greedy policy removes the exploring-starts condition requirements.
+
+The reason $\epsilon-$greedy policy can eliminate the need for exploring-starts condition is its soft nature. A soft policy assigns a positive
+probability to every action at every state. Consequently, generating one episode following a soft policy, the length of the episode will
+sufficient long so that every state-action can be visited and also well explored, thereby allowing us to remove the exploring-starts condition
+requirement.
+
+But how to assign the probability to the action? We also need to guarantee that the action with greatest action-value function should have
+bigger probability. Suppose that $\epsilon \in[0,1]$, the corresponding $\epsilon-$greedy policy has the following form:
+\begin{equation*}
+	\pi(a|s) =
+	\begin{cases}
+		1-\frac{\epsilon}{\left|\mathcal{A}(s)\right|}\left(\left|\mathcal{A}(s)\right|-1\right) & \text{for the greedy action},                                      \\
+		\frac{\epsilon}{\left|\mathcal{A}(s)\right|}                                             & \text{for the other} \left|\mathcal{A}(s)\right|-1 \text{actions}. \\
+	\end{cases}
+\end{equation*}
+where $\left|\mathcal{A}(s)\right|$ denotes the number of actions associated with state s. \par
+
+The $\epsilon-$greedy policy has properties listed below:
+\begin{enumerate}
+
+	\item Become greedy policy when $\epsilon=0$ and taking all actions with equal probability when $\epsilon=1$ (At this point, the agent behavior is
+	      completely random). Now, we can see $\epsilon-$greedy policy provide a way to balance exploration and exploitation (greedy policy).
+	\item The probability of taking the greedy action is always than that of taking other actions because:
+	      \begin{equation*}
+		      1-\frac{\epsilon}{\left|\mathcal{A}(s)\right|}\left(\left|\mathcal{A}(s)\right|-1\right)=1-\epsilon+\frac{\epsilon}{\left|\mathcal{A}(s)\right|} \ge \frac{\epsilon}{\left|\mathcal{A}(s)\right|}
+	      \end{equation*}
+\end{enumerate}
+Using $\epsilon-$greedy policy to modify MC Exploring Starts algorithm and get the MC $\epsilon-$Greedy algorithm:
+\begin{algorithm}
+	\caption{MC Exploring Starts}
+	\KwIn {Initial policy $\pi_{0}(a|s)$ and initial value $q(s,a)$ for all $(s,a)$. $Returns(s,a)=0$ and $Num(s,a)=0$ for all $(s,a)$}
+	\KwOut {Search for an optimal policy}
+	\While {Policy is not convergent}{
+	Episode generation: Select a staring state-action pair $(s_{0},a_{0})$ and ensure all pairs can be possibly selected \emph{exploring-starts condition}. \par
+	Following the current policy, generate an episode of length T: $s_{0},a_{0},r_{1},\cdots,s_{T-1},a_{T-1},r_{T}$. \par
+	\For {every episode}{
+	$g \gets 0$ \par
+	\For {each step of the episode, $t=T-1,T-2,\cdots,1,0,$}{
+	$g \gets \gamma g+r_{t+1}$ \par
+	\tcc {every visit strategy}
+	$Returns(s_{t},a_{t}) \gets Returns(s_{t},a_{t})+g$ \par
+	$Num(s_{t},a_{t}) \gets Num(s_{t},a_{t})+1$ \par
+	\tcc {Policy evaluation}
+	$q(s_{t},a_{t}) \gets Returns(s_{t}, a_{t})/Num(s_{t},a_{t})$ \par
+	\tcc {Policy improvement}
+	let $a^{*}=\mathop{\arg \max}_{a}q(s_{t},a)$ and \par
+	\begin{equation*}
+		\pi(a|s_{t}) =
+		\begin{cases}
+			1-\frac{\epsilon}{\left|\mathcal{A}(s_{t})\right|}\left(\left|\mathcal{A}(s_{t})\right|-1\right) & a = a^{*}    \\
+			\frac{\epsilon}{\left|\mathcal{A}(s_{t})\right|}                                                 & a \neq a^{*} \\
+		\end{cases}
+	\end{equation*}
+	}}}
+\end{algorithm}
+

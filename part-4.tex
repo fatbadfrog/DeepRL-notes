@@ -4,261 +4,260 @@
 
 \begin{enumerate}
 
-\item
-  Joint probability
-  \begin{equation*}
-    \sum_{y}p(x,y)=p(x)
-  \end{equation*}
-\item
-  Law of total probability
-  \begin{align*}
-    p(x) &= \sum_{y}p(x,y) = \sum_{y}p(x|y)p(y) \\
-    p(x|a) &= \sum{y}p(x,y|a)
-  \end{align*}
-\item
-  Chain rule of conditional probability
-  \begin{align*}
-    p(a,b,c) &= p(a|b,c)p(b,c) \\
-    &= p(a|b,c)p(b|c)p(c)
-  \end{align*}
-  And because $p(a,b,c)/p(c)=p(a,b|c)$, we obtain
-  \begin{equation}
-    \label{cond1}
-    p(a|b,c)p(b|c) = p(a,b|c)
-  \end{equation}
-  Equation \ref{cond1} is very important in DRL because it tells us how to put a random variable to condition. Now
-  according to \emph{joitprobability} and \emph{law of total probability}, we have
-  \begin{align}
-    p(x|a) &= \sum_{b}p(x,b|a) \notag \\
-    &= \sum_{b}p(x|b,a)p(b|a)
-  \end{align}
+	\item
+	      Joint probability
+	      \begin{equation*}
+		      \sum_{y}p(x,y)=p(x)
+	      \end{equation*}
+	\item
+	      Law of total probability
+	      \begin{align*}
+		      p(x)   & = \sum_{y}p(x,y) = \sum_{y}p(x|y)p(y) \\
+		      p(x|a) & = \sum{y}p(x,y|a)
+	      \end{align*}
+	\item
+	      Chain rule of conditional probability
+	      \begin{align*}
+		      p(a,b,c) & = p(a|b,c)p(b,c)     \\
+		               & = p(a|b,c)p(b|c)p(c)
+	      \end{align*}
+	      And because $p(a,b,c)/p(c)=p(a,b|c)$, we obtain
+	      \begin{equation}
+		      \label{cond1}
+		      p(a|b,c)p(b|c) = p(a,b|c)
+	      \end{equation}
+	      Equation \ref{cond1} is very important in DRL because it tells us how to put a random variable to condition. Now
+	      according to \emph{jointprobability} and \emph{law of total probability}, we have
+	      \begin{align}
+		      p(x|a) & = \sum_{b}p(x,b|a) \notag \\
+		             & = \sum_{b}p(x|b,a)p(b|a)
+	      \end{align}
 \end{enumerate}
 
 \section{Expectation}
 
 \begin{enumerate}
 
-\item
-  Law of total expectation
-  \begin{align}
-    E[X] &= \sum_{x}xp(x) \notag \\
-    &= \sum_{x}x \sum_{a}p(x|a)p(a) \notag \\
-    &= \sum_{a}\left(\sum_{x}xp(x|a)p(a)\right) \notag \\
-    &= \sum_{a}E[X|A=a]p(a)
-  \end{align}
-\item
-  Lemmas of Expectation \\ Before introducing lemmas, consider three cases:
-  \begin{enumerate}
+	\item
+	      Law of total expectation
+	      \begin{align}
+		      E[X] & = \sum_{x}xp(x) \notag                            \\
+		           & = \sum_{x}x \sum_{a}p(x|a)p(a) \notag             \\
+		           & = \sum_{a}\left(\sum_{x}xp(x|a)p(a)\right) \notag \\
+		           & = \sum_{a}E[X|A=a]p(a)
+	      \end{align}
+	\item
+	      Lemmas of Expectation \\ Before introducing lemmas, consider three cases:
+	      \begin{enumerate}
 
-  \item
-    $E[X|Y=a]$(a is a given number): this conditional expectation is a specific \textit{number}.
-  \item
-    $E[X|Y=y]$(y is a normal variable): this conditional expectation is a \textit{funtion of y ie. f(y)}.
-  \item
-    $E[X|Y]$: this conditional expectation is a \textit{random variable} and we can calculate its expectation.
+		      \item
+		            $E[X|Y=a]$(a is a given number): this conditional expectation is a specific \textit{number}.
+		      \item
+		            $E[X|Y=y]$(y is a normal variable): this conditional expectation is a \textit{funtion of y ie. f(y)}.
+		      \item
+		            $E[X|Y]$: this conditional expectation is a \textit{random variable} and we can calculate its expectation.
 
-  \end{enumerate}
-  \begin{lemma}{(Basic properties)}
-    \label{le2}
-    Let X, Y, Z be random varialbes, the following properties hold.
-    \begin{enumerate}
+	      \end{enumerate}
+	      \begin{lemma}{(Basic properties)}
+		      \label{le2}
+		      Let X, Y, Z be random varialbes, the following properties hold.
+		      \begin{enumerate}
 
-    \item
-      $E[a|Y]=a,$ where a is a given number.
-    \item
-      $E[aX+bY|Z]= aE[X|Z]+bE[Y|Z]$
-    \item
-      $E[X|Y]=E[X]$, if X,Y are independent
-    \item
-      $E[Xf(Y)|Y] = f(Y)E[X|Y]$
-    \item
-      $E[f(Y)|Y]=f(Y))$
-    \item
-      $E[X|f(Y),Y]=E[X|Y]$
-    \item
-      $\text{If }X \le 0, \text{ then }E[X|Y] \le 0$
-    \item
-      $\text{If }X \le Z, \text{ then }E[X|Y] \le E[Z|Y]$
+			      \item
+			            $E[a|Y]=a,$ where a is a given number.
+			      \item
+			            $E[aX+bY|Z]= aE[X|Z]+bE[Y|Z]$
+			      \item
+			            $E[X|Y]=E[X]$, if X,Y are independent
+			      \item
+			            $E[Xf(Y)|Y] = f(Y)E[X|Y]$
+			      \item
+			            $E[f(Y)|Y]=f(Y))$
+			      \item
+			            $E[X|f(Y),Y]=E[X|Y]$
+			      \item
+			            $\text{If }X \le 0, \text{ then }E[X|Y] \le 0$
+			      \item
+			            $\text{If }X \le Z, \text{ then }E[X|Y] \le E[Z|Y]$
 
-    \end{enumerate}
+		      \end{enumerate}
 
-  \end{lemma}
-  Here we only prove some important properties.
-  \begin{proof}{\textbf{(d)} $E[Xf(Y)|Y] = f(Y)E[X|Y]$}
-    \\ \\ $\text{ For all } y$, we have
-    \begin{align*}
-      E[Xf(Y=y)|Y=y] &= \sum_{x}xf(y)p(x|Y=y) \\
-      &= f(y)\sum_{x}xp(x|Y=y) \\
-      &= f(y)E[X|y=y]
-    \end{align*}
-    | Since equation above is valid for any y, the proof is complete.
-  \end{proof}
-  \begin{proof}{\textbf{(e)} $E[f(Y)|Y] = f(Y)$}
-    \\ \\According to (d), we know $E[Xf(Y)|Y] = f(Y)E[X|Y]$. If we set X=1 and according to (a), we immidiately get
-    $E[f(Y)|Y] = f(Y)$
-  \end{proof}
-  \begin{proof}{\textbf{(f)} $E[X|Y,f(Y)] = E[X|Y]$}
-    \\ \\According to definition of conditional expectation, $\text{ for all } y$
-    \begin{align*}
-      E[X|Y=y,f(Y=y)] &= \sum_{x}xp(x|y,f(y)) \\
-      &=\sum_{x}x \frac{p(x,f(y)|y)}{p(f(y)|y)} \qquad (according\ to\ \ref{cond1}) \\
-      &=\sum_{x}x \frac{p(f(y)|x,y)p(x|y)}{p(f(y)|y)} \\
-      &=\sum_{x}xp(x|y) \qquad (p(f(y)|y)=1, p(f(y)|x,y)=1) \\
-      &= E[X|Y=y]
-    \end{align*}
-    So $E[X|Y,f(Y)] = E[X|Y]$.
-  \end{proof}
+	      \end{lemma}
+	      Here we only prove some important properties.
+	      \begin{proof}{\textbf{(d)} $E[Xf(Y)|Y] = f(Y)E[X|Y]$}
+		      \\ \\ $\text{ For all } y$, we have
+		      \begin{align*}
+			      E[Xf(Y=y)|Y=y] & = \sum_{x}xf(y)p(x|Y=y) \\
+			                     & = f(y)\sum_{x}xp(x|Y=y) \\
+			                     & = f(y)E[X|y=y]
+		      \end{align*}
+		      | Since equation above is valid for any y, the proof is complete.
+	      \end{proof}
+	      \begin{proof}{\textbf{(e)} $E[f(Y)|Y] = f(Y)$}
+		      \\ \\According to (d), we know $E[Xf(Y)|Y] = f(Y)E[X|Y]$. If we set X=1 and according to (a), we immediately get
+		      $E[f(Y)|Y] = f(Y)$
+	      \end{proof}
+	      \begin{proof}{\textbf{(f)} $E[X|Y,f(Y)] = E[X|Y]$}
+		      \\ \\According to definition of conditional expectation, $\text{ for all } y$
+		      \begin{align*}
+			      E[X|Y=y,f(Y=y)] & = \sum_{x}xp(x|y,f(y))                                                       \\
+			                      & =\sum_{x}x \frac{p(x,f(y)|y)}{p(f(y)|y)} \qquad (according\ to\ \ref{cond1}) \\
+			                      & =\sum_{x}x \frac{p(f(y)|x,y)p(x|y)}{p(f(y)|y)}                               \\
+			                      & =\sum_{x}xp(x|y) \qquad (p(f(y)|y)=1, p(f(y)|x,y)=1)                         \\
+			                      & = E[X|Y=y]
+		      \end{align*}
+		      So $E[X|Y,f(Y)] = E[X|Y]$.
+	      \end{proof}
 
-  \begin{lemma}{Let X,Y,Z be random variables. The following properties hold.}
-    \begin{enumerate}
+	      \begin{lemma}{Let X,Y,Z be random variables. The following properties hold.}
+		      \begin{enumerate}
 
-    \item
-      $E[E[X|Y]]=E[X]$
-    \item
-      $E[E[X|Y,Z]]=E[X]$
-    \item
-      $E[E[X|Y]|Y]=E[X|Y]$
+			      \item
+			            $E[E[X|Y]]=E[X]$
+			      \item
+			            $E[E[X|Y,Z]]=E[X]$
+			      \item
+			            $E[E[X|Y]|Y]=E[X|Y]$
 
-    \end{enumerate}
+		      \end{enumerate}
 
-  \end{lemma}
-  You should keep in mind that $E[X|Y]$ is a random variable which is a function of random variable Y.
-  \begin{proof}{\textbf{(a)} $E[E[X|Y]]=E[X]$}
-    \\ \\Because $E[X|Y]$ is a function of random variable Y, we have
-    \begin{align*}
-      E[E[X|Y]] &= E[f(Y)] \\
-      &= \sum_{y}f(y)p(y) \\
-      &= \sum_{y}E[X|Y=y]p(y) \\
-      &= \sum_{y}\sum_{x}xp(x|y)p(y) \\
-      &= \sum_{y}\sum_{x}xp(x,y) \\
-      &= \sum_{x}xp(x) \\
-      &= E[X]
-    \end{align*}
-  \end{proof}
-  \begin{proof}{\textbf{(b)} $E[E[X|Y,Z]]=E[X]$}
-    \\ \\$E[X|Y,Z]$ is a funtion of $Y,Z$, so we have
-    \begin{align*}
-      E[E[X|Y,Z]] &= E[f(Y,Z)] \\
-      &= \sum_{y}\sum_{z}f(y,z)p(y,z) \\
-      &= \sum_{y}\sum_{z}E[X|Y=y,Z=z]p(y,z) \\
-      &= \sum_{y}\sum_{z}\sum_{x}xp(x|y,z)p(y,z) \\
-      &= \sum_{y}\sum_{z}\sum_{x}xp(x,y,z) \\
-      &= \sum_{x}xp(x) \\
-      &= E[X]
-    \end{align*}
-    From the proof, we can see that the number of conditional random variables ($Y,Z$) can be expand to any finite
-    number. So we have $E[E[X|Y_{1},\cdots,Y_{n}]]=E[X]$.
-  \end{proof}
-  \begin{proof}{\textbf{(c)} E[E[X|Y]|Y]=E[X|Y]}
-    This proof follows immediately from property Lemma \ref{le2}(e). Because $E[X|Y]$ is a function of Y whihch is also
-    a random variable, we denote it as $f(Y)=E[X|Y]$. So we have
-    \begin{align*}
-      E[E[X|Y]|Y] &= E[f(Y)|Y] \\
-      &= f(Y) \qquad (Lemma\ \ref{le2}(e)) \\
-      &= E[X|Y]
-    \end{align*}
-  \end{proof}
-\item
-  Definition of stochastic convergence ($\Omega is \textit{sample space}$)
-  \begin{enumerate*}
+	      \end{lemma}
+	      You should keep in mind that $E[X|Y]$ is a random variable which is a function of random variable Y.
+	      \begin{proof}{\textbf{(a)} $E[E[X|Y]]=E[X]$}
+		      \\ \\Because $E[X|Y]$ is a function of random variable Y, we have
+		      \begin{align*}
+			      E[E[X|Y]] & = E[f(Y)]                     \\
+			                & = \sum_{y}f(y)p(y)            \\
+			                & = \sum_{y}E[X|Y=y]p(y)        \\
+			                & = \sum_{y}\sum_{x}xp(x|y)p(y) \\
+			                & = \sum_{y}\sum_{x}xp(x,y)     \\
+			                & = \sum_{x}xp(x)               \\
+			                & = E[X]
+		      \end{align*}
+	      \end{proof}
+	      \begin{proof}{\textbf{(b)} $E[E[X|Y,Z]]=E[X]$}
+		      \\ \\$E[X|Y,Z]$ is a function of $Y,Z$, so we have
+			      \begin{align*}
+				      E[E[X|Y,Z]] & = E[f(Y,Z)]                               \\
+				                  & = \sum_{y}\sum_{z}f(y,z)p(y,z)            \\
+				                  & = \sum_{y}\sum_{z}E[X|Y=y,Z=z]p(y,z)      \\
+				                  & = \sum_{y}\sum_{z}\sum_{x}xp(x|y,z)p(y,z) \\
+				                  & = \sum_{y}\sum_{z}\sum_{x}xp(x,y,z)       \\
+				                  & = \sum_{x}xp(x)                           \\
+				                  & = E[X]
+			      \end{align*}
+			      From the proof, we can see that the number of conditional random variables ($Y,Z$) can be expanded to any finite
+			      number. So we have $E[E[X|Y_{1},\cdots,Y_{n}]]=E[X]$.
+	      \end{proof}
+	      \begin{proof}{\textbf{(c)} E[E[X|Y]|Y]=E[X|Y]}
+		      This proof follows immediately from property Lemma \ref{le2}(e). Because $E[X|Y]$ is a function of Y which is also
+		      a random variable, we denote it as $f(Y)=E[X|Y]$. So we have
+		      \begin{align*}
+			      E[E[X|Y]|Y] & = E[f(Y)|Y]                         \\
+			                  & = f(Y) \qquad (Lemma\ \ref{le2}(e)) \\
+			                  & = E[X|Y]
+		      \end{align*}
+	      \end{proof}
+	\item
+	      Definition of stochastic convergence ($\Omega is \textit{sample space}$)
+	      \begin{enumerate}
 
-  \item
-    Sure convergence
-    \begin{definition}
-      $\{X_{k}\}$ converges surely (or \textit{everywhere} or \textit{pointwise}) to $X$ if
-      \begin{equation*}
-        \lim_{k \to \infty}X_{k}(\omega)=X(\omega), \text{ for all } \omega \in \Omega
-      \end{equation*}
-      It means that $\lim_{k \to \infty}X_{k}(\omega)=X(\omega)$ is valid for all points in $\Omega$. It also can be
-      equivalently stated as:
-      \begin{equation*}
-        A=\Omega \text{ where } A=\left\{\omega \in \Omega: \lim_{k \to \infty} X(\omega)=X(\Omega)\right\}
-      \end{equation*}
-    \end{definition}
-  \item
-    Almost sure convergence
-    \begin{definition}
-      $\{X_{k}\}$ converges almost surely (or \textit{almost everywhere} or \textit{with probability 1}) to $X$ if
-      \begin{equation*}
-        P(A)=1 \text{ where } A={\omega \in \Omega: \lim_{k \to \infty}X_{k}(\omega)=X(\omega)}
-      \end{equation*}
-    \end{definition}
-    This definition means when $k \to \infty$, points in $\Omega$ almost satisfy
-    \begin{equation*}
-      \lim_{k \to \infty}X_{k}(\omega)=X(\omega)
-    \end{equation*}
-    The set of poinsts for which the limit is invalid has a zero measure. Almost sure convergence \emph{first evaluates
-      the convergence of every point} in $\Omega$, then \emph{check the measure of set} which is formed by the points
-    that can converge.
-  \item
-    Convergence in probability
-    \begin{definition}
-      $\{X_{k}\}$ converges in probability to $X$ if for any $\epsilon > 0$,
-      \begin{equation*}
-        \lim_{k \to \infty}P(A_{k}) = 0 \text{ where } A_{k}=\left\{\omega \in \Omega:
-        \left\|X_{k}(\omega)-X(\omega)\right\| > \epsilon \right\}
-      \end{equation*}
-    \end{definition}
-    The difference between \emph[myblue]{Almost sure converge} and \emph[myblue]{Convergence in probability} is that for
-    convergence in probability, we check the \emph{whole sample space} for a given $k$ and form set $A_{k}$ by the
-    points that is valid for $\left\|X_{k}(\omega)-X(\omega)\right\| > \epsilon $. From this procedure, we have a set
-    sequence $\{A_{k}\}$ and if the measure of this sequence converges to zero,$X_{k}$ converges in probability. That is
-    to say, \emph[myblue]{Almost sure converge} only cares about the result (last set), \emph[myblue]{Convergence in
-      probability} cares about process (the sequence of $A_{k}$).
-  \end{enumerate*}
+		      \item
+		            Sure convergence
+		            \begin{definition}
+			            $\{X_{k}\}$ converges surely (or \textit{everywhere} or \textit{pointwise}) to $X$ if
+			            \begin{equation*}
+				            \lim_{k \to \infty}X_{k}(\omega)=X(\omega), \text{ for all } \omega \in \Omega
+			            \end{equation*}
+			            It means that $\lim_{k \to \infty}X_{k}(\omega)=X(\omega)$ is valid for all points in $\Omega$. It also can be
+			            equivalently stated as:
+			            \begin{equation*}
+				            A=\Omega \text{ where } A=\left\{\omega \in \Omega: \lim_{k \to \infty} X(\omega)=X(\Omega)\right\}
+			            \end{equation*}
+		            \end{definition}
+		      \item
+		            Almost sure convergence
+		            \begin{definition}
+			            $\{X_{k}\}$ converges almost surely (or \textit{almost everywhere} or \textit{with probability 1}) to $X$ if
+			            \begin{equation*}
+				            P(A)=1 \text{ where } A={\omega \in \Omega: \lim_{k \to \infty}X_{k}(\omega)=X(\omega)}
+			            \end{equation*}
+		            \end{definition}
+		            This definition means when $k \to \infty$, points in $\Omega$ almost satisfy
+		            \begin{equation*}
+			            \lim_{k \to \infty}X_{k}(\omega)=X(\omega)
+		            \end{equation*}
+		            The set of poinsts for which the limit is invalid has a zero measure. Almost sure convergence \emph{first evaluates
+			            the convergence of every point} in $\Omega$, then \emph{check the measure of set} which is formed by the points
+		            that can converge.
+		      \item
+		            Convergence in probability
+		            \begin{definition}
+			            $\{X_{k}\}$ converges in probability to $X$ if for any $\epsilon > 0$,
+			            \begin{equation*}
+				            \lim_{k \to \infty}P(A_{k}) = 0 \text{ where } A_{k}=\left\{\omega \in \Omega:
+				            \left\|X_{k}(\omega)-X(\omega)\right\| > \epsilon \right\}
+			            \end{equation*}
+		            \end{definition}
+		            The difference between \emph[myblue]{Almost sure converge} and \emph[myblue]{Convergence in probability} is that for
+		            convergence in probability, we check the \emph{whole sample space} for a given $k$ and form set $A_{k}$ by the
+		            points that is valid for $\left\|X_{k}(\omega)-X(\omega)\right\| > \epsilon $. From this procedure, we have a set
+		            sequence $\{A_{k}\}$ and if the measure of this sequence converges to zero,$X_{k}$ converges in probability. That is
+		            to say, \emph[myblue]{Almost sure converge} only cares about the result (last set), \emph[myblue]{Convergence in
+			            probability} cares about process (the sequence of $A_{k}$).
+	      \end{enumerate}
 \end{enumerate}
 
 \section{Convergence of stochastic sequences}
 
 \begin{enumerate}
 
-\item
-  Convergence of martingale sequence
-  \begin{definition}
-    A stochastic sequence $\{X_{k}\}^{\infty}_{k=1}$ is called a martingle if $E[|X_{k}|] < \infty$ and
-    \begin{equation*}
-      E \left[X_{k+1}|X_{1},\cdots,X_{k}\right] = X_{k}
-    \end{equation*}
-    almost surely for all k. In application, $E \left[X_{k+1}|X_{1},\cdots,X_{k}\right]$ is often written as $E
-    \left[X_{k+1}|\mathcal{H}_{k}\right]$ for short where $\mathcal{H}_{k}={X_{1},\cdots,X_{k}}$
-  \end{definition}
-  Here "almost surely" is due to that $E[X_{k+1}|\mathcal{H}_{k}]$ is a random variable (function of $\mathcal{H}_{k}$).
-  \begin{definition}
-    A stochastic sequence $\{X_{k}\}^{\infty}_{k=1}$ is called a \textit{submartingle} if $E[|X_{k}|] < \infty$ and
-    \begin{equation*}
-      E \left[X_{k+1}|X_{1},\cdots,X_{k}\right] \ge X_{k}
-    \end{equation*}
-    for all k.
-  \end{definition}
-  \begin{definition}
-    A stochastic sequence $\{X_{k}\}^{\infty}_{k=1}$ is called a \textit{supermartingale} if $E[|X_{k}|] < \infty$ and
-    \begin{equation*}
-      E \left[X_{k+1}|X_{1},\cdots,X_{k}\right] \le X_{k}
-    \end{equation*}
-    for all k.
-  \end{definition}
-  \begin{theorem}{(Martingale convergence theorem).}
-    If $\{X_{k}\}$ is a \textit{submartingale (or supermartingale)}, then there is a finite random variable $X$ such
-    that $X_{k} \to X$ almost surely.
-  \end{theorem}
-\item
-  Convergence of quasimartingale sequence \\ \\The event $A_{k}$ is defined as $A_{k} \doteq \{\omega \in \Omega:
-  E[X_{k+1-X_{k}}| \mathcal{H}_{k}] \ge 0\}$, where $\mathcal{H}_k=\{X_{1}\cdots,X_{k}\}$. Intuitively, $A_{k}$
-  indicates that $X_{k+1}$ is greater than $X_{k}$ in expectation. Let $\mathbbm{1}_{A_{k}}$ be an indicator function:
-  \begin{equation*}
-    \mathbbm{1}_{A_{k}} = \left\{
-    \begin{array}{rl}
-      1 & E[X_{k+1}-X_{k}|\mathcal{H}_{k}] \ge 0,\\ \\ 0 & E[X_{k+1}-X_{k}|\mathcal{H}_{k}] < 0.
-    \end{array}
-    \right
+	\item
+	      Convergence of martingale sequence
+	      \begin{definition}
+		      A stochastic sequence $\{X_{k}\}^{\infty}_{k=1}$ is called a martingle if $E[|X_{k}|] < \infty$ and
+		      \begin{equation*}
+			      E \left[X_{k+1}|X_{1},\cdots,X_{k}\right] = X_{k}
+		      \end{equation*}
+		      almost surely for all k. In application, $E \left[X_{k+1}|X_{1},\cdots,X_{k}\right]$ is often written as $E
+			      \left[X_{k+1}|\mathcal{H}_{k}\right]$ for short where $\mathcal{H}_{k}={X_{1},\cdots,X_{k}}$
+	      \end{definition}
+	      Here "almost surely" is due to that $E[X_{k+1}|\mathcal{H}_{k}]$ is a random variable (function of $\mathcal{H}_{k}$).
+	      \begin{definition}
+		      A stochastic sequence $\{X_{k}\}^{\infty}_{k=1}$ is called a \textit{submartingle} if $E[|X_{k}|] < \infty$ and
+		      \begin{equation*}
+			      E \left[X_{k+1}|X_{1},\cdots,X_{k}\right] \ge X_{k}
+		      \end{equation*}
+		      for all k.
+	      \end{definition}
+	      \begin{definition}
+		      A stochastic sequence $\{X_{k}\}^{\infty}_{k=1}$ is called a \textit{supermartingale} if $E[|X_{k}|] < \infty$ and
+		      \begin{equation*}
+			      E \left[X_{k+1}|X_{1},\cdots,X_{k}\right] \le X_{k}
+		      \end{equation*}
+		      for all k.
+	      \end{definition}
+	      \begin{theorem}{(Martingale convergence theorem).}
+		      If $\{X_{k}\}$ is a \textit{submartingale (or supermartingale)}, then there is a finite random variable $X$ such
+		      that $X_{k} \to X$ almost surely.
+	      \end{theorem}
+	\item
+	      Convergence of quasimartingale sequence \\ \\The event $A_{k}$ is defined as $A_{k} \doteq \{\omega \in \Omega:
+		      E[X_{k+1-X_{k}}| \mathcal{H}_{k}] \ge 0\}$, where $\mathcal{H}_k=\{X_{1}\cdots,X_{k}\}$. Intuitively, $A_{k}$
+	      indicates that $X_{k+1}$ is greater than $X_{k}$ in expectation. Let $\mathbbm{1}_{A_{k}}$ be an indicator function:
+	      \begin{equation*}
+		      \mathbbm{1}_{A_{k}} = \left\{
+		      \begin{array}{rl}
+			      1 & E[X_{k+1}-X_{k}|\mathcal{H}_{k}] \ge 0, \\ \\ 0 & E[X_{k+1}-X_{k}|\mathcal{H}_{k}] < 0.
+		      \end{array}
+		      \right.
+	      \end{equation*}
 
-  \end{equation*}
-
-  \begin{theorem}{(Quasimartingale convergence theorem).}
-    For a \textit{nonnegative stochastic sequence} $\{X_{k} \ge 0\}$, if
-    \begin{equation*}
-      \sum_{k=1}^{\infty}E \left[X_{k+1}-X_{k}\mathbbm{1}_{A_{k}}\right] < \infty
-    \end{equation*}
-    then there is a \textit{finite random variable} such that $X_{k} \to X$ almost surely as $k \to \infty$.
-  \end{theorem}
+	      \begin{theorem}{(Quasimartingale convergence theorem).}
+		      For a \textit{nonnegative stochastic sequence} $\{X_{k} \ge 0\}$, if
+		      \begin{equation*}
+			      \sum_{k=1}^{\infty}E \left[X_{k+1}-X_{k}\mathbbm{1}_{A_{k}}\right] < \infty
+		      \end{equation*}
+		      then there is a \textit{finite random variable} such that $X_{k} \to X$ almost surely as $k \to \infty$.
+	      \end{theorem}
 \end{enumerate}

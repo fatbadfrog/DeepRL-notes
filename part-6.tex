@@ -1,0 +1,91 @@
+\part{Stochastic Approximation}
+This part lays the necessary foundation for learning Temporal-Difference Methods. We reconsider the mean estimation problem, suppose there is a
+sequence of i.i.d samples $\{x_{i}\}_{i=1}^{n}$, the expectation of X can be approximated by:
+\begin{equation}\label{ch6:1}
+	E[X] \approx \overline{x} \doteq \frac{1}{n}\sum_{i=1}^{n}x_{i}
+\end{equation}
+
+There are two methods to solve \ref{ch6:1}:
+\begin{enumerate}
+
+	\item Non-incremental method. This is a standard MC method that collects all the samples first and then calculates the average. For an accurate
+	      estimation, a sufficient number of samples should be collected, which may require a significant amount of time.
+	\item Incremental method. To avoid the drawbacks of non-incremental method, this method calculate the average incrementally instead of waiting for
+	      all samples. Specially,
+	      \begin{equation*}
+		      \omega_{k+1} \doteq \frac{1}{k}\sum_{i=1}^{k}x_{i}
+	      \end{equation*}
+	      and hence
+	      \begin{equation*}
+		      \omega_{k} = \frac{1}{k-1}\sum_{i=1}^{k-1}x_{i}
+	      \end{equation*}
+	      The $\omega_{k+1}$ can be expressed as:
+	      \begin{equation}\label{ch6:2}
+		      \omega_{k+1}=\frac{1}{k}(\sum_{i=1}^{k-1}x_{i}+x_{k}) = \frac{1}{k}\left[(k-1) \omega_{k}+x_{k}\right]= \omega_{k}-\frac{1}{k}(\omega_{k}-x_{k})
+	      \end{equation}
+
+\end{enumerate}
+The advantage of \ref{ch6:2} is that average can be calculated immediately upon receiving a sample. As more samples are obtained, the accuracy of estimation can be gradually improved according to the law of large numbers. Moreover, replacing $k$ in \ref{ch6:2} is replaced with $\alpha$ results in the main algorithm we will discuss in this part.
+\begin{equation}\label{ch6:3}
+	\omega_{k+1}=\omega_{k}-\alpha(\omega_{k}-x_{k})
+\end{equation}
+
+\subsection{Robbins-Monro algorithm}
+Algorithm \ref{ch6:3} is a typical representation of the stochastic approximation method. In fact, the term "stochastic approximation" refers
+to a broad class of \emph{stochastic iterative} algorithms for solving root-finding or optimization problems. Compared to many other
+root-finding algorithms, stochastic approximation is powerful because it does not require knowledge of objective functions or their
+derivatives. This section will introduce the famous Robbins-Monro (RM) algorithm. \par
+
+Suppose we want to find the root of the equation:
+\begin{equation*}
+	g(\omega) = 0
+\end{equation*}
+Before introducing the details of RM algorithm, it is essential to note that root-finding problem is significant as many other problems can be formulated into its form. For example, if we want to find the maximum or minimum of $J(\omega)$, we can let $g(\omega) = \nabla J(\omega)$ and solve the equation $g(\omega)=0$ which is a root-finding problem. \par
+As mentioned above, RM is powerful because it does not require the expression of objective function and its derivatives \sn{for instance,
+	function represented by neural networks whose structure and parameters are unknown}. Even the function has a noisy observation, RM algorithm
+still solve the problem. Suppose that noisy observation of $g(\omega)$ is expressed as:
+\begin{equation*}
+	\tilde{g}(\omega) = g(\omega) + \eta
+\end{equation*}
+where $\eta$ is the observation error, which is Gaussian or not. \par
+The RM algorithm that solve $g(\omega)=0$ is:
+\begin{equation}\label{rm_algorithm}
+	\omega_{k+1}=\omega_{k}-\alpha\tilde{g}(\omega)
+\end{equation}
+The reason for RM algorithm can find the root is very simple. That is {\color{myred}{$\ \omega_{k+1} \text{ is closer to } \omega^{*} \\ \text{than } \omega_{k}$}}. The explanation is listed below:
+\begin{enumerate}
+
+	\item If $\omega_{k}>\omega^{*}$, then $\tilde{g}(\omega)>0$. Then $\omega_{k+1}=\omega_{k}-\alpha\tilde{g}(\omega)<\omega_{k}$. If
+	      $\alpha\tilde{g}(\omega)$ is sufficient small, we have $\omega^{*}<\omega_{k+1}<\omega_{k}$.
+	\item If $\omega_{k}<\omega^{*}$, then $\tilde{g}(\omega)<0$. Then $\omega_{k+1}=\omega_{k}-\alpha\tilde{g}(\omega)>\omega_{k}$. If
+	      $\alpha\tilde{g}(\omega)$ is sufficient small, we have $\omega_{k}<\omega_{k+1}<\omega^{*}$.
+
+\end{enumerate}
+In either case, $\omega_{k+1}$ is closer to $\omega^{*}$ than $\omega_{k}$. A rigorous convergence result is given below:
+\begin{theorem}[Robbins-Monro theorem]\label{rm:1}
+	In the Robbins-Monro algorithm \ref{rm_algorithm}, if
+	\begin{enumerate}[(a)]
+
+		\item $0<c_{1} \le \nabla_{\omega}g(\omega) \le c_{2}$ for all $\omega$;
+		\item $\sum_{k=1}^{\infty}a_{k}=\infty \ \text{and} \ \sum_{k=1}^{\infty}a_{k}^{2} < \infty$
+		\item $E[\eta_{k}| \mathcal{H}_{k}] = 0 \ \text{and} \ E[\eta^{2}|\mathcal{H}_{k}]<\infty$
+
+	\end{enumerate}
+	where $\mathcal{H}_{k}= \{\omega_{k},\omega_{k-1},\cdots \}$, then $\omega_{k}$ almost surely converges to $\omega^{*}$ satisfying $g(\omega^{*})=0$.
+
+\end{theorem}
+The three conditions in theorem \ref{rm:1} are explained as follows:
+\begin{enumerate}
+
+	\item $0<c_{1} \le \nabla_{\omega}g(\omega) \le c_{2}$ for all $\omega$. This condition indicates that $g(\omega)$ is a monotonically increasing function which guarantee that $g(\omega)=0$ has a unique root. $\nabla g(\omega) \le c_{2}$ indicates that the gradient of $g(\omega)$ is bounded from above.
+	\item The second condition is common in reinforcement learning. $\sum_{k=1}^{\infty}a_{k}^{2} < \infty$ requires $a_{k}$ converges to zero as $k \to
+		      \infty$, whereas $\sum_{k=1}^{\infty}a_{k}=\infty$ requires that $a_{k}$ should not converge to zero too fast. Here is insight into why
+	      $\{a_{k}\}$ should be configured this way.
+
+	      First, suppose that the observation is bounded. Since
+	      \begin{equation*}
+
+	      \end{equation*}
+
+\end{enumerate}
+

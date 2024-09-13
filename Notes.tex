@@ -1,7 +1,8 @@
 \documentclass[10pt]{article}
 
 \usepackage{NotesTeXV3}
-
+\usepackage{tikz}
+\usepackage{pgfplots}
 \usepackage{color}
 \usepackage{bbm}
 \usepackage[dvipsnames]{xcolor}
@@ -15,30 +16,35 @@
 
 \usepackage[ruled,linesnumbered]{algorithm2e}
 \usetikzlibrary{graphs,quotes,positioning,fit,backgrounds,tikzmark,calc,arrows.meta}
+\newcommand{\highlight}[2][yellow]{\mathchoice%
+  {\colorbox{#1}{$\displaystyle#2$}}%
+  {\colorbox{#1}{$\textstyle#2$}}%
+  {\colorbox{#1}{$\scriptstyle#2$}}%
+  {\colorbox{#1}{$\scriptscriptstyle#2$}}}%
 
 \usepackage{booktabs,array}
 
 \begin{document}
-  \title{Note for \texttt{Deep Reinoforcement Learing}}
-  \author{Wang Hui}
-  \affiliation{Amateur Marchine Learning Researcher in NUDT} \emailAdd{wanghuichn1234@gmail.com} \maketitle
+\title{Note for \texttt{Deep Reinoforcement Learing}}
+\author{Wang Hui}
+\affiliation{Amateur Machine Learning Researcher in NUDT} \emailAdd{wanghuichn1234@gmail.com} \maketitle
 
-  \newpage
+\newpage
 
-  \pagestyle{fancynotes} \include{part-1.tex}
+\pagestyle{fancynotes} \include{part-1.tex}
+\newpage
 
-  \newpage
+\include{part-2.tex}
+\newpage
 
-  \include{part-2.tex}
+\include{part-3.tex}
+\newpage
 
-  \newpage
+\include{part-4.tex}
+\newpage
 
-  \include{part-3.tex}
+\include{part-5.tex}
+\newpage
 
-  \newpage
-
-  \include{part-4.tex}
-
-  \newpage
-
+\include{part-6.tex}
 \end{document}
