@@ -1,91 +1,229 @@
-\part{Stochastic Approximation}
-This part lays the necessary foundation for learning Temporal-Difference Methods. We reconsider the mean estimation problem, suppose there is a
-sequence of i.i.d samples $\{x_{i}\}_{i=1}^{n}$, the expectation of X can be approximated by:
-\begin{equation}\label{ch6:1}
-	E[X] \approx \overline{x} \doteq \frac{1}{n}\sum_{i=1}^{n}x_{i}
+\part{Stochastic Approximation} This part lays the necessary foundation for learning Temporal-Difference Methods. We
+reconsider the mean estimation problem, suppose there is a sequence of i.i.d samples $\{x_{i}\}_{i=1}^{n}$, the
+expectation of X can be approximated by:
+\begin{equation}
+  \label{ch6:1}
+  E[X] \approx \overline{x} \doteq \frac{1}{n}\sum_{i=1}^{n}x_{i}
 \end{equation}
 
 There are two methods to solve \ref{ch6:1}:
 \begin{enumerate}
 
-	\item Non-incremental method. This is a standard MC method that collects all the samples first and then calculates the average. For an accurate
-	      estimation, a sufficient number of samples should be collected, which may require a significant amount of time.
-	\item Incremental method. To avoid the drawbacks of non-incremental method, this method calculate the average incrementally instead of waiting for
-	      all samples. Specially,
-	      \begin{equation*}
-		      \omega_{k+1} \doteq \frac{1}{k}\sum_{i=1}^{k}x_{i}
-	      \end{equation*}
-	      and hence
-	      \begin{equation*}
-		      \omega_{k} = \frac{1}{k-1}\sum_{i=1}^{k-1}x_{i}
-	      \end{equation*}
-	      The $\omega_{k+1}$ can be expressed as:
-	      \begin{equation}\label{ch6:2}
-		      \omega_{k+1}=\frac{1}{k}(\sum_{i=1}^{k-1}x_{i}+x_{k}) = \frac{1}{k}\left[(k-1) \omega_{k}+x_{k}\right]= \omega_{k}-\frac{1}{k}(\omega_{k}-x_{k})
-	      \end{equation}
+  \item
+        Non-incremental method. This is a standard MC method that collects all the samples first and then calculates the
+        average. For an accurate estimation, a sufficient number of samples should be collected, which may require a
+        significant amount of time.
+  \item
+        Incremental method. To avoid the drawbacks of non-incremental method, this method calculate the average incrementally
+        instead of waiting for all samples. Specially,
+        \begin{equation*}
+          \omega_{k+1} \doteq \frac{1}{k}\sum_{i=1}^{k}x_{i}
+        \end{equation*}
+        and hence
+        \begin{equation*}
+          \omega_{k} = \frac{1}{k-1}\sum_{i=1}^{k-1}x_{i}
+        \end{equation*}
+        The $\omega_{k+1}$ can be expressed as:
+        \begin{equation}
+          \label{ch6:2}
+          \omega_{k+1}=\frac{1}{k}(\sum_{i=1}^{k-1}x_{i}+x_{k}) = \frac{1}{k}\left[(k-1) \omega_{k}+x_{k}\right]=
+          \omega_{k}-\frac{1}{k}(\omega_{k}-x_{k})
+        \end{equation}
 
 \end{enumerate}
-The advantage of \ref{ch6:2} is that average can be calculated immediately upon receiving a sample. As more samples are obtained, the accuracy of estimation can be gradually improved according to the law of large numbers. Moreover, replacing $k$ in \ref{ch6:2} is replaced with $\alpha$ results in the main algorithm we will discuss in this part.
-\begin{equation}\label{ch6:3}
-	\omega_{k+1}=\omega_{k}-\alpha(\omega_{k}-x_{k})
+The advantage of \ref{ch6:2} is that average can be calculated immediately upon receiving a sample. As more samples are
+obtained, the accuracy of estimation can be gradually improved according to the law of large numbers. Moreover,
+replacing $k$ in \ref{ch6:2} is replaced with $\alpha$ results in the main algorithm we will discuss in this part.
+\begin{equation}
+  \label{ch6:3}
+  \omega_{k+1}=\omega_{k}-\alpha(\omega_{k}-x_{k})
 \end{equation}
 
 \subsection{Robbins-Monro algorithm}
-Algorithm \ref{ch6:3} is a typical representation of the stochastic approximation method. In fact, the term "stochastic approximation" refers
-to a broad class of \emph{stochastic iterative} algorithms for solving root-finding or optimization problems. Compared to many other
-root-finding algorithms, stochastic approximation is powerful because it does not require knowledge of objective functions or their
-derivatives. This section will introduce the famous Robbins-Monro (RM) algorithm. \par
 
-Suppose we want to find the root of the equation:
-\begin{equation*}
-	g(\omega) = 0
-\end{equation*}
-Before introducing the details of RM algorithm, it is essential to note that root-finding problem is significant as many other problems can be formulated into its form. For example, if we want to find the maximum or minimum of $J(\omega)$, we can let $g(\omega) = \nabla J(\omega)$ and solve the equation $g(\omega)=0$ which is a root-finding problem. \par
-As mentioned above, RM is powerful because it does not require the expression of objective function and its derivatives \sn{for instance,
-	function represented by neural networks whose structure and parameters are unknown}. Even the function has a noisy observation, RM algorithm
-still solve the problem. Suppose that noisy observation of $g(\omega)$ is expressed as:
-\begin{equation*}
-	\tilde{g}(\omega) = g(\omega) + \eta
-\end{equation*}
-where $\eta$ is the observation error, which is Gaussian or not. \par
-The RM algorithm that solve $g(\omega)=0$ is:
-\begin{equation}\label{rm_algorithm}
-	\omega_{k+1}=\omega_{k}-\alpha\tilde{g}(\omega)
-\end{equation}
-The reason for RM algorithm can find the root is very simple. That is {\color{myred}{$\ \omega_{k+1} \text{ is closer to } \omega^{*} \\ \text{than } \omega_{k}$}}. The explanation is listed below:
-\begin{enumerate}
+  Algorithm \ref{ch6:3} is a typical representation of the stochastic approximation method. In fact, the term "stochastic
+  approximation" refers to a broad class of \emph{stochastic iterative} algorithms for solving root-finding or
+  optimization problems. Compared to many other root-finding algorithms, stochastic approximation is powerful because it
+  does not require knowledge of objective functions or their derivatives. This section will introduce the famous
+  Robbins-Monro (RM) algorithm. \par
 
-	\item If $\omega_{k}>\omega^{*}$, then $\tilde{g}(\omega)>0$. Then $\omega_{k+1}=\omega_{k}-\alpha\tilde{g}(\omega)<\omega_{k}$. If
-	      $\alpha\tilde{g}(\omega)$ is sufficient small, we have $\omega^{*}<\omega_{k+1}<\omega_{k}$.
-	\item If $\omega_{k}<\omega^{*}$, then $\tilde{g}(\omega)<0$. Then $\omega_{k+1}=\omega_{k}-\alpha\tilde{g}(\omega)>\omega_{k}$. If
-	      $\alpha\tilde{g}(\omega)$ is sufficient small, we have $\omega_{k}<\omega_{k+1}<\omega^{*}$.
+  Suppose we want to find the root of the equation:
+  \begin{equation*}
+    g(\omega) = 0
+  \end{equation*}
+  Before introducing the details of RM algorithm, it is essential to note that root-finding problem is significant as many
+  other problems can be formulated into its form. For example, if we want to find the maximum or minimum of $J(\omega)$,
+  we can let $g(\omega) = \nabla J(\omega)$ and solve the equation $g(\omega)=0$ which is a root-finding problem. \par As
+  mentioned above, RM is powerful because it does not require the expression of objective function and its derivatives
+  \sn{for instance, function represented by neural networks whose structure and parameters are unknown}. Even the function
+  has a noisy observation, RM algorithm still solve the problem. Suppose that noisy observation of $g(\omega)$ is
+  expressed as:
+  \begin{equation*}
+    \tilde{g}(\omega) = g(\omega) + \eta
+  \end{equation*}
+  where $\eta$ is the observation error, which is Gaussian or not. \par The RM algorithm that solve $g(\omega)=0$ is:
+  \begin{equation}
+    \label{rm_algorithm}
+    \omega_{k+1}=\omega_{k}-\alpha\tilde{g}(\omega)
+  \end{equation}
+  The reason for RM algorithm can find the root is very simple. That is {\color{myred}{$\ \omega_{k+1} \text{ is closer to
+          } \omega^{*} \\ \text{than } \omega_{k}$}}. The explanation is listed below:
+  \begin{enumerate}
 
-\end{enumerate}
-In either case, $\omega_{k+1}$ is closer to $\omega^{*}$ than $\omega_{k}$. A rigorous convergence result is given below:
-\begin{theorem}[Robbins-Monro theorem]\label{rm:1}
-	In the Robbins-Monro algorithm \ref{rm_algorithm}, if
-	\begin{enumerate}[(a)]
+    \item
+          If $\omega_{k}>\omega^{*}$, then $\tilde{g}(\omega)>0$. Then
+          $\omega_{k+1}=\omega_{k}-\alpha\tilde{g}(\omega)<\omega_{k}$. If $\alpha\tilde{g}(\omega)$ is sufficient small, we
+          have $\omega^{*}<\omega_{k+1}<\omega_{k}$.
+    \item
+          If $\omega_{k}<\omega^{*}$, then $\tilde{g}(\omega)<0$. Then
+          $\omega_{k+1}=\omega_{k}-\alpha\tilde{g}(\omega)>\omega_{k}$. If $\alpha\tilde{g}(\omega)$ is sufficient small, we
+          have $\omega_{k}<\omega_{k+1}<\omega^{*}$.
 
-		\item $0<c_{1} \le \nabla_{\omega}g(\omega) \le c_{2}$ for all $\omega$;
-		\item $\sum_{k=1}^{\infty}a_{k}=\infty \ \text{and} \ \sum_{k=1}^{\infty}a_{k}^{2} < \infty$
-		\item $E[\eta_{k}| \mathcal{H}_{k}] = 0 \ \text{and} \ E[\eta^{2}|\mathcal{H}_{k}]<\infty$
+  \end{enumerate}
 
-	\end{enumerate}
-	where $\mathcal{H}_{k}= \{\omega_{k},\omega_{k-1},\cdots \}$, then $\omega_{k}$ almost surely converges to $\omega^{*}$ satisfying $g(\omega^{*})=0$.
+  In either case, $\omega_{k+1}$ is closer to $\omega^{*}$ than $\omega_{k}$. A rigorous convergence result is given
+  below:
+  \begin{theorem}[Robbins-Monro theorem]
+    \label{rm:1}
+    In the Robbins-Monro algorithm \ref{rm_algorithm}, if
+    \begin{enumerate}
+      \item
+            $0<c_{1} \le \nabla_{\omega}g(\omega) \le c_{2}$ for all $\omega$;
+      \item
+            $\sum_{k=1}^{\infty}\alpha_{k}=\infty \ \text{and} \ \sum_{k=1}^{\infty}\alpha_{k}^{2} < \infty$
+      \item
+            $E[\eta_{k}| \mathcal{H}_{k}] = 0 \ \text{and} \ E[\eta^{2}|\mathcal{H}_{k}]<\infty$
+    \end{enumerate}
+    where $\mathcal{H}_{k}= \{\omega_{k},\omega_{k-1},\cdots \}$, then $\omega_{k}$ almost surely converges to
+    $\omega^{*}$ satisfying $g(\omega^{*})=0$.
+  \end{theorem}
 
-\end{theorem}
-The three conditions in theorem \ref{rm:1} are explained as follows:
-\begin{enumerate}
+  The three conditions \sn{$\alpha_{k}=\frac{1}{k}$ satisfies these conditions} in theorem \ref{rm:1} are explained as
+  follows:
+  \begin{enumerate}
+    \item
+          $0<c_{1} \le \nabla_{\omega}g(\omega) \le c_{2}$ for all $\omega$. This condition indicates that $g(\omega)$ is a
+          monotonically increasing function which guarantee that $g(\omega)=0$ has a unique root. $\nabla g(\omega) \le c_{2}$
+          indicates that the gradient of $g(\omega)$ is bounded from above.
+    \item
+          The second condition is common in reinforcement learning. $\sum_{k=1}^{\infty}\alpha_{k}^{2} < \infty$ requires
+          $\alpha_{k}$ converges to zero as $k \to \infty$, whereas $\sum_{k=1}^{\infty}\alpha_{k}=\infty$ requires that
+          $\alpha_{k}$ should not converge to zero too fast. Here is insight into why $\{\alpha_{k}\}$ should be configured this
+          way. First, suppose that the observation is bounded. Since
+          \begin{equation*}
+            \omega_{k+1} - \omega_{k} = -\alpha_{k}\tilde{g_{k}}(\omega_{k},\eta_{k})
+          \end{equation*}
+          if $\alpha_{k}\to \infty$, $\alpha_{k}\to 0$ and hence $-\alpha_{k}\tilde{g_{k}}(\omega_{k},\eta_{k})$ which means
+          $\omega_{k+1}-\omega_{k} \to 0$. Otherwise, if $\{\alpha_{k}\}$ not converges to zero, $\omega_{k}$ will fluctuate.
+          Second, summarizing both sides of every equation of $\omega_{2} - \omega_{1} =
+            -\alpha_{1}\tilde{g_{1}}(\omega_{1},\eta_{1}), \omega_{3} - \omega_{2} =
+            -\alpha_{k}\tilde{g_{2}}(\omega_{2},\eta_{2}), \cdots$, gives
+          \begin{equation*}
+            \omega_{\infty} - \omega_{1} = -\sum_{k=1}^{\infty}\alpha_{k}\tilde{g_{k}}(\omega_{k},\eta_{k})
+          \end{equation*}
+          if $\sum_{k=1}^{\infty}<\infty$, then $\left|\sum_{k=1}^{\infty}\alpha_{k}\tilde{g_{k}}(\omega_{k},\eta_{k})\right|$
+          is also bounded. let b denotes the upper bound such that
+          \begin{equation*}
+            \left|\omega_{\infty} - \omega_{1}\right| =
+            \left|\sum_{k=1}^{\infty}\alpha_{k}\tilde{g_{k}}(\omega_{k},\eta_{k})\right| \le b
+          \end{equation*}
+          Now you will see if the initial guess value $\omega_{1}$ is far away from the true value
+          ($\left|\omega_{1}-\omega^{*}\right|>b$), $\omega_{\infty}$ will never converge to $\omega^{*}$.
+  \end{enumerate}
 
-	\item $0<c_{1} \le \nabla_{\omega}g(\omega) \le c_{2}$ for all $\omega$. This condition indicates that $g(\omega)$ is a monotonically increasing function which guarantee that $g(\omega)=0$ has a unique root. $\nabla g(\omega) \le c_{2}$ indicates that the gradient of $g(\omega)$ is bounded from above.
-	\item The second condition is common in reinforcement learning. $\sum_{k=1}^{\infty}a_{k}^{2} < \infty$ requires $a_{k}$ converges to zero as $k \to
-		      \infty$, whereas $\sum_{k=1}^{\infty}a_{k}=\infty$ requires that $a_{k}$ should not converge to zero too fast. Here is insight into why
-	      $\{a_{k}\}$ should be configured this way.
+\subsection{Application to mean estimation}
 
-	      First, suppose that the observation is bounded. Since
-	      \begin{equation*}
+  Using RM algorithm to solve mean estimation, the key point is to find $\tilde{g}(\omega)$, which is
+  $\tilde{g}(\omega)=g(\omega)+\eta$. The $g(\omega)$ is obvious if the estimation problem is formulated to root-finding.
+  Since we want to find a $\omega$ equals to E[X], the $g(\omega)$ can be defined as:
+  \begin{equation*}
+    g(\omega) = \omega - E[X]
+  \end{equation*}
+  \par We know that $\tilde{g}(\omega)$ is $g(\omega)$ plus a noisy observation which is the difference between the
+  observation value of random variable X and E[X], so $\tilde{g}(\omega)$ can be defined as:
+  \begin{align*}
+    \tilde{g}(\omega) & = g(\omega) + \eta                                                            \\
+                      & = \omega - E[X] + \underbrace{\colorbox{myred!20!white}{$(E[X] - x)$}}_{\eta} \\
+                      & = \omega - x
+  \end{align*}
+  Now, we can use RM algorithm
+  \begin{equation*}
+    \omega_{k+1} = \omega_{k} - \alpha_{k}\tilde{g}(\omega_{k}) = \omega_{k} - \alpha_{k}(\omega_{k}-x_{k})
+  \end{equation*}
+  to find the root of $g(\omega)$ which is the E[X]. \sn{$\alpha_{k}$ can be set to $\frac{1}{k}$}
 
-	      \end{equation*}
+\subsection{Dvoretzky's converge theorem}
 
-\end{enumerate}
+  To prove the convergence of RM algorithm, we use Dvoretzky's converge theorem, which is
+  \begin{theorem}{(Dvoretzky's theorem)}
+    \label{thm:dvoretzky}
+    Considering a stochastic process:
+    \begin{equation*}
+      \Delta_{k+1} = \left(1-\alpha_k\right)\Delta_{k+1}+\beta_k\eta_k
+    \end{equation*}
+    where \( \{\alpha_k \}_{k=1}^{\infty}, \{\beta_k\}_{k=1}^{\infty} \) and \( \{\eta_k\}_{k=1}^{\infty} \) are
+    stochastic sequences. Here \( \alpha_k \ge 0, \beta_k \ge 0 \) for all k. Then \( \Delta_k \) converges to zero almost
+    surely if the following condition are satisfied.
+    \begin{enumerate}[label=\alph*)]
+      \item
+            \( \sum_{k=1}^{\infty} \alpha_k =\infty, \sum_{k=1}^{\infty} \alpha_{k}^{2}< \infty, and \sum_{k=1}^{\infty}
+            \beta_k^{2}<\infty\) are uniformly almostly surely.
+      \item
+            $\mathbb{E}[\eta_{k}|\mathcal{H}_{k}]=0$ and $\mathbb{E}[\eta^{2}|\mathcal{H}_{k}] \le C$ almost surely.\\ where
+            $\mathcal{H}_{k}=\{\Delta_k,\Delta_{k-1},\cdots,\eta_{k-1},\cdots,\alpha_{k-1},\cdots,\beta_{k-1},\cdots\}$
+    \end{enumerate}
+  \end{theorem}
+  Before proving this theorem, something need to be clarified,
+  \begin{enumerate}
 
+    \item
+          In RM algorithm, $\{\alpha_{k}\}$ and $\{\beta_{k}\}$ is deterministic, whereas in Dvoretzky's theorem, they can be
+          random variables which depend on \{$\mathcal{H}_{k}$\}. So the first condition is stated as "uniformly almostly
+          surely". \sn{uniformly almostly surely usually describes the convergence of stochastic sequence. It should be noted
+            that the sum of $\{\alpha_{k}\}$ and $\{\beta_{k}\}$ are also stochastic sequence.}
+    \item
+          Theorem \ref{thm:dvoretzky} does not require $\sum_{k=1}^{\infty} \beta_{k}=\infty$. In fact, in the extreme case in
+          which $\beta_{k}=0$ for all k, the sequence $\{\Delta_{k}\}$ can still converge.
+
+  \end{enumerate}
+  We prove Theorem \ref{thm:dvoretzky} using quasimartingale converge theorem (\ref{thm:quasimartingale}).
+  \begin{proof}
+    Let $h_{k} \triangleq \Delta_{k}^{2}$, then we have,
+    \begin{align*}
+      h_{k+1} - h_{k} & = \Delta_{k+1}^{2} - \Delta_{k}^{2}                                                                                     \\
+                      & = (\Delta_{k+1}+\Delta_{k})(\Delta_{k+1}-\Delta_{k})                                                                    \\
+                      & = \left[(2-\alpha_{k}) \Delta_{k}+\beta_{k} \eta_{k}\right](-\alpha_{k} \Delta_{k}+\beta_{k} \eta_{k})                  \\
+                      & = -\alpha_{k}(2-\alpha_{k}) \Delta_{k}^{2} + \beta_{k}^{2} \eta_{k}^{2} + 2(1-\alpha_{k}) \beta_{k} \eta_{k} \Delta_{k}
+    \end{align*}
+    Taking exception on both sides of the above equation, we have \[\mathbb{E}[h_{k+1} - h_{k}|\mathcal{H}_{k}] =
+      \mathbb{E}[-\alpha_{k}(2-\alpha_{k}) \Delta_{k}^{2}|\mathcal{H}_{k}] + \mathbb{E}[\beta_{k}^{2}
+        \eta_{k}^{2}|\mathcal{H}_{k}] + \mathbb{E}[2(1-\alpha_{k}) \beta_{k} \eta_{k} \Delta_{k}|\mathcal{H}_{k}] \]
+    According to the conditions stated in Theorem \ref{thm:dvoretzky}, the sequences $\{\alpha_{k}\}$ and $\{\beta_{k}\}$
+    either rely on $\mathcal{H}_{k}$ or are deterministic. Then, they can be taken out of the expectation.(Lemma
+    \ref{le2}(e)) Therefore, we have
+    \begin{equation}
+      \label{equ:hk}
+      \mathbb{E}[h_{k+1} - h_{k}|\mathcal{H}_{k}] = -\alpha_{k}(2-\alpha_{k}) \Delta_{k}^{2} + \beta_{k}^{2}
+      \mathbb{E}[\eta_{k}^{2}|\mathcal{H}_{k}] + 2(1-\alpha_{k}) \beta_{k} \Delta_{k}\mathbb{E}[\eta_{k} |\mathcal{H}_{k}]
+    \end{equation}
+    Since the condition implies $\alpha_{k} \to 0$ almostly surely as $k\to \infty$, there exists a finite n such that
+    $\{\alpha_{k}\} \le 1$ for all $k\ge n$ almostly surely. Without lossing generality, we merely consider the case of
+    $\alpha_{k} \le 1$. Then, $-\alpha_{k}(2-\alpha_{k}) \Delta_{k}^{2} <0$. As assumed, the second term $\beta_{k}^{2}
+      \mathbb{E}[\eta_{k}^{2}|\mathcal{H}_{k}] \le \beta_{k}^{2}C$ and the third term equals to zero. Hence, \[
+      \mathbb{E}[h_{k+1} - h_{k}|\mathcal{H}_{k}] \le \beta_{k}^{2}C \] and \[\sum_{k=1}^{\infty}{\mathbb{E}[h_{k+1} -
+        h_{k}|\mathcal{H}_{k}]} \le \sum_{k=1}^{\infty}{\beta_{k}^{2}C}\] Now according to quasimartingale converge
+    theorem (\ref{thm:quasimartingale}), $\{\Delta_{k}\}$ converges almostly surely. Next, we need to determine which
+    value $\{\Delta_{k}\}$ converges to. Based on eq.(\ref{equ:hk})
+    \begin{equation*}
+      \sum_{k=1}^{\infty}{\alpha_{k}(2-\alpha_{k}) \Delta_{k}^{2}} = \sum_{k=1}^{\infty}{\beta_{k}^{2}
+      \mathbb{E}[\eta_{k}^{2}|\mathcal{H}_{k}]} - \sum_{k=1}^{\infty} {\mathbb{E}[h_{k+1} - h_{k}|\mathcal{H}_{k}]}
+    \end{equation*}
+    \\ Both terms of right side are bounded and hence $\sum_{k=1}^{\infty}{\alpha_{k}(2-\alpha_{k}) \Delta_{k}^{2}} $ is
+    also bounded. Since we merely consider the case of $\alpha_{k} \le 1$, then
+    \begin{equation*}
+      \infty > \sum_{k=1}^{\infty}{\alpha_{k}(2-\alpha_{k}) \Delta_{k}^{2}} \ge \sum_{k=1}^{\infty}{\alpha_{k}
+      \Delta_{k}^{2}} > 0
+    \end{equation*}
+    Therefore $\sum_{k=1}^{\infty}{\alpha_{k} \Delta_{k}^{2}}$ is bounded. Since $\sum_{k=1}^{\infty}{\alpha_{k}}=\infty$,
+    we must have $\Delta_{k} \to 0$ almostly surely.
+  \end{proof}
