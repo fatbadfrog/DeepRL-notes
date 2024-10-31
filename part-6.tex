@@ -210,8 +210,8 @@ replacing $k$ in \ref{ch6:2} is replaced with $\alpha$ results in the main algor
       \mathbb{E}[\eta_{k}^{2}|\mathcal{H}_{k}] \le \beta_{k}^{2}C$ and the third term equals to zero. Hence, \[
       \mathbb{E}[h_{k+1} - h_{k}|\mathcal{H}_{k}] \le \beta_{k}^{2}C \] and \[\sum_{k=1}^{\infty}{\mathbb{E}[h_{k+1} -
         h_{k}|\mathcal{H}_{k}]} \le \sum_{k=1}^{\infty}{\beta_{k}^{2}C}\] Now according to quasimartingale converge
-    theorem (\ref{thm:quasimartingale}), $\{\Delta_{k}\}$ converges almost surely. Next, we need to determine which
-    value $\{\Delta_{k}\}$ converges to. Based on equation (\ref{equ:hk})
+    theorem (\ref{thm:quasimartingale}), $\{\Delta_{k}\}$ converges almost surely. Next, we need to determine which value
+    $\{\Delta_{k}\}$ converges to. Based on equation (\ref{equ:hk})
     \begin{equation*}
       \sum_{k=1}^{\infty}{\alpha_{k}(2-\alpha_{k}) \Delta_{k}^{2}} = \sum_{k=1}^{\infty}{\beta_{k}^{2}
       \mathbb{E}[\eta_{k}^{2}|\mathcal{H}_{k}]} - \sum_{k=1}^{\infty} {\mathbb{E}[h_{k+1} - h_{k}|\mathcal{H}_{k}]}
@@ -274,10 +274,151 @@ replacing $k$ in \ref{ch6:2} is replaced with $\alpha$ results in the main algor
   As RM algorithm assumed, $0<c_{1}\le \nabla_{\omega} g(\omega) \le c_{2}$ is bounded, and since
   $\sum_{k=1}^{\infty}a_{k}=\infty$ and $\sum_{k=1}^{\infty}a_{k}^{2}<\infty$, $\alpha_{k}$ satisfies the condition of
   Dvoretzky's theorem. Thus, all conditions satisfy Dvoretzky's theorem requirements \sn {conditions of $\{\eta_{k}\}$ in
-    RM algorithm is as  same as Dvoretzky's theorem} and hence $\Delta_{k}$ converges to zero which means that $\omega_{k}
+    RM algorithm is as same as Dvoretzky's theorem} and hence $\Delta_{k}$ converges to zero which means that $\omega_{k}
     \to \omega^{*}$ as $k\to \infty$.
 
 \subsection{An extension of Dvoretzky's theorem}
 
   This is an extension of Dvoretzky's theorem for handling multiple variables and can be used to analyze the convergence
   of Q-learning.
+  \begin{theorem}
+    Considering a finite set $\mathcal{S}$ of real numbers. For the stochastic process,
+    \begin{equation}
+      \label{eq:dvo-extension}
+      \Delta_{k+1}(s) = (1-\alpha_{k}(s)) \Delta_{k}(s) + \beta_{k}(s)\eta_{k}(s)
+    \end{equation}
+    it holds that $\Delta_{k}(s)$ converges to zero almost surely for every $s\in \mathcal{S}$ if the following conditions
+    are satisfied:
+    \begin{enumerate}[label=(\alph*)]
+      \item
+            $\sum_{k=1}^{\infty} \alpha_{k}(s)=\infty$, $\sum_{k=1}^{\infty} \alpha_{k}^{2}(s)<\infty$, $\sum_{k=1}^{\infty}
+              \beta_{k}^{2}(s)<\infty$, and $\mathbb{E}[\beta_{k}(s)|\mathcal{H}_{k}]\le
+              \mathbb{E}[\alpha_{k}(s)|\mathcal{H}_{k}]$ uniformly almost surely.
+      \item
+            $\Vert\mathbb{E}[\eta_{k}(s)|\mathcal{H}_{k}]\Vert_{\infty} \le \gamma\Vert \Delta_{k}\Vert_{\infty}$, where $\gamma
+              \in (0,1)$
+      \item
+            $var[\eta_{k}(s)|\mathcal{H}_{k}] \le C(1+\Vert \Delta_{k}(s)\Vert_{\infty})^{2}$, where $C$ is a constant.
+    \end{enumerate}
+    Here $\mathcal{H}_{k}=\{\Delta_{k}, \Delta_{k-1},\cdots,\eta_{k-1},\cdots,\alpha_{k-1},\cdots,\beta_{k-1},\cdots\}$
+    represents the historical information and $\Vert \cdot \Vert_{\infty}$ is maximum norm.
+  \end{theorem}
+  We do not prove this theorem and just give some remarks below
+  \begin{enumerate}
+
+    \item
+          The variables $s$ can be reviewed as index. In the context of reinforcement learning, it indicates the state or the
+          state-action pair. The maximum norm $\Vert \cdot \Vert_{\infty}$ is defined over set, which means
+          $\Vert\mathbb{E}[\eta_{k}(s)|\mathcal{H}_{k}]\Vert_{\infty}=\max_{s\in
+              \mathcal{S}}\left|\mathbb{E}[\eta_{k}(s)|\mathcal{H}_{k}]\right|$
+    \item
+          This theorem can handle the reinforcement learning problem with multiple states because it uses $\Vert \cdot
+            \Vert_{\infty}$. It only requires the expectation and variance of $\eta_{k}(s)$ is bounded by $\Delta_{k}(s)$.
+    \item
+          Convergence of $\Delta_{k}(s)$ for all $s\in \mathcal{S}$ requires that the conditions are valid for all $s \in
+            \mathcal{S}$, that is for all states or state-cation pairs.
+
+  \end{enumerate}
+
+\section{Stochastic gradient descent}
+
+  RM is a root-finding algorithm, and we will introduce an optimization algorithm which is widely used in machine leaning
+  field. The algorithm is called Stochastic gradient descent, and we will see it is a special RM algorithm. Considering
+  the following optimization problem:
+  \begin{equation*}
+    \min_{\omega}J(\omega) = \mathbb{E}[f(\omega,X)]
+  \end{equation*}
+  where $\omega$ is parameters to be optimized, and $X$ is a random variable. Here $\omega$ and $X$ can be either scalars
+  or vectors. The function $f( cdot)$ is a scalar. A straight method for solving this problem is gradient descent method,
+  which is
+  \begin{align}
+    \label{eq:gd-expectation}
+    \omega_{k+1} & = \omega_{k} - \alpha_{k} \nabla_{\omega}\mathbb{E}[f(\omega,X)] \\
+                 & = \omega_{k} - \alpha_{k}\mathbb{E}[\nabla_{\omega}f(\omega,X)]
+  \end{align}
+  In practice, we usually do not know the distribution of $X$, one way to estimate the expectation is to collect numerous
+  i.i.d samples $\{x_{i}\}_{i=1}^{\infty}$ of $X$ and the approximated value is
+  \begin{equation*}
+    \mathbb{E}[\nabla_{\omega}f(\omega,X)]\approx \frac{1}{n}\sum_{i=1}^{n}\nabla_{\omega}f(\omega,x_{i})
+  \end{equation*}
+  Then equation (\ref{eq:gd-expectation}) can be rewritten as
+  \begin{equation*}
+    \omega_{k+1} = \omega_{k} - \alpha_{k}\frac{1}{n}\sum_{i=1}^{n}\nabla_{\omega}f(\omega,x_{i})
+  \end{equation*}
+  One problem with above algorithm is we can not collect so many samples at one time. If the sample is collected one by
+  one, it is favorable to update $\omega$ every time a sample is collected. So we should use algorithm below:
+  \begin{equation}
+    \label{eq:SGD}
+    \omega_{k+1} = \omega_{k} - \alpha_{k}\nabla_{\omega}f(\omega,x_{i})
+  \end{equation}
+  where $x_{k}$ is the sample collected at step $k$. This is the well known stochastic gradient descent (SGD) algorithm.
+  The term "stochastic" denotes that the algorithm relies on the stochastic samples $\{x_{i}\}$. One may immediately doubt
+  the correctness of SGD because $\nabla_{\omega}f(\omega,x_{i}) \neq \mathbb{E}[\nabla_{\omega}f(\omega,X)]$. Now we give
+  the proof on the convergence of SGD.\sn{SGD is an optimization algorithm which find $\omega^{*}$ to minimize the target
+    function $J(\omega)=\mathbb{E}[f(\omega,X)]$. It is equivalent to find the root of $\nabla_{\omega}
+      \mathbb{E}[f(\omega,X)]=0$}.
+
+  \begin{theorem}{Convergence of SGD}
+    \label{thm:SGD}
+    For the SGD algorithm in (\ref{eq:SGD}), if the following conditions are satisfied, then $\omega_{k}$ converges to the
+    root of $\nabla_{\omega} \mathbb{E}[f(\omega,X)]=0$ almost surely.
+    \begin{enumerate}
+      [label=(\alph*)]
+
+      \item
+            $0<c_{1} \le \nabla_{\omega}^{2}f(\omega,X) \le c_{2}$;
+      \item
+            $\sum_{k=1}^{\infty}a_{k}=\infty$ and $\sum_{k=1}^{\infty}a_{k}^{2}<\infty$;
+      \item
+            $\{x_{k}\}_{k=1}^{\infty}$ are i.i.d.
+
+    \end{enumerate}
+
+  \end{theorem}
+  Condition (a) is about the convexity of $f$. It requires curvature of $f$ to be bounded from above and below. Here
+  $\omega$ is a scalar, and so is $\nabla_{\omega}^{2}f(\omega,X)$ is. When $\omega$ is a vector,
+  $\nabla_{\omega}^{2}f(\omega,X)$ is the well-known Hessian matrix.
+
+  \begin{proof}
+    Let $g(\omega)=\nabla_{\omega}J(\omega)=\nabla_{\omega}\mathbb{E}[f(\omega,X)]=\mathbb{E}[\nabla_{\omega}f(\omega,X)]$
+    We use the RM algorithm and have
+    \begin{equation*}
+      \omega_{k+1} = \omega_{k} - a_{k}\tilde{g}(\omega_{k},x_{k})
+    \end{equation*}
+    Now we should find the form of $\eta_{k}$. It should be noticed that if we can get all sample values at step $k$, we
+    can directly use $g(\omega)$ not $\tilde{g}(\omega)$ to update $\omega_{k+1}$. But in SGD algorithm, the sample value
+    is collected one by one, so what we have is $\nabla_{\omega}f(\omega,x_{k})$ and a "noise"($\eta_{k}$) which is the
+    difference between the observation and true system output is generated. According to the definition of
+    $\tilde{g}(\omega)$, we have
+    \begin{align*}
+      \tilde{g}(\omega_{k}.x_{k}) & = g(\omega_{k}) + \eta_{k}                                                                                                                         \\
+                                  & = \mathbb{E}[\nabla_{\omega}f(\omega_{k},X)] + \underbrace{\nabla_{\omega}f(\omega_{k},x_{k}) - \mathbb{E}[\nabla_{\omega}f(\omega_{k},X)]}_{\eta} \\
+                                  & = \nabla_{\omega}f(\omega_{k},x_{k})
+    \end{align*}
+    and the final form of RM algorithm for solving $g(\omega)=0$ is
+    \begin{equation}
+      \label{eq:RM-SGD}
+      \omega_{k+1} = \omega_{k} - a_{k}\nabla_{\omega}f(\omega_{k},x_{k})
+    \end{equation}
+    and this form also is SGD algorithm. If we can conform equation (\ref{eq:RM-SGD}) satisfies conditions in theorem
+    (\ref{rm:1}), convergence of SGD can be guaranteed. Since
+    $\nabla_{\omega}g(\omega)=\mathbb{E}[\nabla_{\omega}^{2}f(\omega,X)]$ and $\nabla_{\omega}^{2}f(\omega,X)$ is bounded
+    according to this theorem, $c_{1} \le \nabla_{\omega}g(\omega) \le c_{2}$ is satisfied. \par The second condition in
+    theorem (\ref{rm:1}) is the same as this theorem. \par For the third condition in theorem (\ref{rm:1}), we first
+    compute $\mathbb{E}[\eta_{k}|\mathcal{H}_{k}]$.
+    \begin{equation*}
+      \mathbb{E}[\eta_{k}|\mathcal{H}_{k}] = \mathbb{E}[\nabla_{\omega}f(\omega_{k}, x_{k})|\mathcal{H}_{k}] -
+      \mathbb{E}[\mathbb{E}[\nabla_{\omega}f(\omega_{k},X)]|\mathcal{H}_{k}]
+    \end{equation*}
+    Because $\{x_{k}\}_{k=1}^{\infty}$ is i.i.d and independent of $\mathcal{H}_{k}=\{\omega_{k},\omega_{k-1},\cdots\}$,
+    the first term of the right side of the equation above is
+    $\mathbb{E}_{x_{k}}[\nabla_{\omega}f(\omega,x_{k})]=\mathbb{E}[\nabla_{\omega}f(\omega_{k},X)]$. For the second term,
+    the inside expectation gives a function of $\omega_{k}$ so that this term equals to \marginnote{$\omega_{k}$ is an element of
+      $\mathcal{H}_{k}$ and $\mathbb{E}[f(Y)|Y]=f(Y)$} $\mathbb{E}[\nabla_{\omega}f(\omega_{k},X)]$. Therefore,
+    \begin{equation*}
+      \mathbb{E}[\eta_{k}|\mathcal{H}_{k}] = 0
+    \end{equation*}
+    The condition $\mathbb{E}[\eta_{k}^{2}|\mathcal{H}_{k}]<\infty$ can also be satisfied if
+    $\|\nabla_{\omega}f(\omega,x_{k})\|<\infty$. Since the three conditions in theorem (\ref{rm:1}) are satisfied, the
+    convergence of the SGD algorithm follows.
+  \end{proof}
