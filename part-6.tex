@@ -39,7 +39,7 @@ replacing $k$ in \ref{ch6:2} is replaced with $\alpha$ results in the main algor
   \omega_{k+1}=\omega_{k}-\alpha(\omega_{k}-x_{k})
 \end{equation}
 
-\subsection{Robbins-Monro algorithm}
+\section{Robbins-Monro algorithm}
 
   Algorithm \ref{ch6:3} is a typical representation of the stochastic approximation method. In fact, the term "stochastic
   approximation" refers to a broad class of \emph{stochastic iterative} algorithms for solving root-finding or
@@ -150,7 +150,7 @@ replacing $k$ in \ref{ch6:2} is replaced with $\alpha$ results in the main algor
   \end{equation*}
   to find the root of $g(\omega)$ which is the E[X]. \sn{$\alpha_{k}$ can be set to $\frac{1}{k}$}
 
-\subsection{Dvoretzky's converge theorem}
+\section{Dvoretzky's converge theorem}
 
   To prove the convergence of RM algorithm, we use Dvoretzky's converge theorem, which is
   \begin{theorem}{(Dvoretzky's theorem)}
@@ -413,8 +413,8 @@ replacing $k$ in \ref{ch6:2} is replaced with $\alpha$ results in the main algor
     Because $\{x_{k}\}_{k=1}^{\infty}$ is i.i.d and independent of $\mathcal{H}_{k}=\{\omega_{k},\omega_{k-1},\cdots\}$,
     the first term of the right side of the equation above is
     $\mathbb{E}_{x_{k}}[\nabla_{\omega}f(\omega,x_{k})]=\mathbb{E}[\nabla_{\omega}f(\omega_{k},X)]$. For the second term,
-    the inside expectation gives a function of $\omega_{k}$ so that this term equals to \marginnote{$\omega_{k}$ is an element of
-      $\mathcal{H}_{k}$ and $\mathbb{E}[f(Y)|Y]=f(Y)$} $\mathbb{E}[\nabla_{\omega}f(\omega_{k},X)]$. Therefore,
+    the inside expectation gives a function of $\omega_{k}$ so that this term equals to \marginnote{$\omega_{k}$ is an
+      element of $\mathcal{H}_{k}$ and $\mathbb{E}[f(Y)|Y]=f(Y)$} $\mathbb{E}[\nabla_{\omega}f(\omega_{k},X)]$. Therefore,
     \begin{equation*}
       \mathbb{E}[\eta_{k}|\mathcal{H}_{k}] = 0
     \end{equation*}
@@ -422,3 +422,67 @@ replacing $k$ in \ref{ch6:2} is replaced with $\alpha$ results in the main algor
     $\|\nabla_{\omega}f(\omega,x_{k})\|<\infty$. Since the three conditions in theorem (\ref{rm:1}) are satisfied, the
     convergence of the SGD algorithm follows.
   \end{proof}
+
+  \subsection{Convergence pattern of SGD}
+
+    The convergence of SGD has been confirmed. Here we demonstrate the interesting convergence pattern of SGD. The relative
+    error between the stochastic gradient and the true gradient can be defined as:
+    \begin{equation*}
+      \delta_{k} \triangleq \frac{\|\nabla_{\omega}f(\omega,X) -
+        \mathbb{E}[\nabla_{\omega}f(\omega,X)]\|}{\|\mathbb{E}[\nabla_{\omega}f(\omega,X)]\|}
+    \end{equation*}
+    Since $\omega^{*}$ is the optimal solution, $\mathbb{E}[\nabla_{\omega}f(\omega^{*},X)]=0$, then the relative error can
+    be rewritten as using mean value theorem:
+    \begin{align*}
+      \delta & = \frac{\|\nabla_{\omega}f(\omega,X) - \mathbb{E}[\nabla_{\omega}f(\omega,X)]\|}{\|\mathbb{E}[\nabla_{\omega}f(\omega,X)]-\mathbb{E}[\nabla_{\omega}f(\omega^{*},X)]\|}                                    \\
+             & = \frac{\|\nabla_{\omega}f(\omega,X) - \mathbb{E}[\nabla_{\omega}f(\omega,X)]\|}{\|\mathbb{E}[\nabla_{\omega}^{2}f(\tilde{\omega},X)(\omega-\omega^{*})]\|} \quad (\tilde{\omega} \in [\omega,\omega^{*}]) \\
+    \end{align*}
+    If $f$ is strict convex such that $\nabla_{\omega}^{2}f(\omega,X) \ge c >0$,
+    \begin{align*}
+      \|\mathbb{E}[\nabla_{\omega}^{2}f(\tilde{\omega},X)(\omega-\omega^{*})]\| & =
+      \|\mathbb{E}[\nabla_{\omega}^{2}f(\tilde{\omega},X)]\|\|(\omega-\omega^{*})\| \\ & \ge c\|(\omega-\omega^{*})\|
+    \end{align*}
+    So the relative error
+    \begin{equation*}
+      \delta \le \frac{\|\nabla_{\omega}f(\omega,X) - \mathbb{E}[\nabla_{\omega}f(\omega,X)]\|}{c\|(\omega-\omega^{*})\|}
+    \end{equation*}
+    From the inequality above, the relative error $\delta$ is inversely proportional to $\|\omega-\omega^{*}\|$. As a
+    result, if $\omega_{k}$ is far from $\omega^{*}$, relative error is small and SGD behaves like gradient descent so that
+    $\omega_{k}$ quickly converge to $\omega^{*}$. When $\omega_{k}$ is close to $\omega^{*}$, the relative error is large
+    and the convergence may exhibit more randomness.
+
+  \subsection{BGD, SGD and mini-batch GD}
+
+    Those three concept are very simple. At one step, BGD uses the whole samples, SGD just uses a single sample, whereas
+    mini-batch GD(MBGD) use a few more samples. In particular, suppose $\omega^{*}$ is solution for minimizing
+    $J(\omega)=\mathbb{E}[f(\omega,X)]$. Given a set of random samples $\{x_{i}\}_{i=1}^{n}$, the BGD, SGD and MBGD for
+    solving the problem are, respectively,
+    \begin{align*}
+      \omega_{k+1} = \omega_{k} - \alpha_{k}\frac{1}{n}\sum_{i=1}^{n}\nabla_{w}f(\omega,x_{i}) \quad (BGD) \\
+      \omega_{k+1} = \omega_{k} - \alpha_{k}\nabla_{w}f(\omega,x_{i}) \quad (SGD)                          \\
+      \omega_{k+1} = \omega_{k} - \alpha_{k}\frac{1}{m}\sum_{i=1}^{m}\nabla_{w}f(\omega,x_{i}) \quad (MBGD)
+    \end{align*}
+    When n is large, $1/n \sum_{i=1}^{n} \nabla_{\omega}f(\omega,x_{i})$ is close to $\mathbb{E}[\nabla_{\omega}f(\omega,
+        X)]$ in BGD. In the MBGD, $m$ is the size of the subset $\{x_{i}\}_{i=1}^{n}$ that is collected at step $k$. MBGD is
+    an intermediate version between SGD and BGD which exhibit less randomness than SGD and using smaller set than BGD. Of
+    course, MBGD in general has a faster convergence speed than SGD since $1/m \sum_{i=1}^{m}
+      \nabla_{\omega}f(\omega,x_{i})$ is closer to $\mathbb{E}[\nabla_{\omega}f(\omega, X)]$ than
+    $\nabla_{\omega}f(\omega,x_{i})$.
+
+  \subsection{A deterministic formulation of SGD}
+
+    This is the last topic which I think is very interesting. "Stochastic" in SGD is because $\{x_{i}\}$ is a stochastic
+    sequence. However, if the sequence is a deterministic sequence, can we use algorithm below to find the optimal solution
+    for $\min_{\omega} J(\omega) = \frac{1}{n}\sum_{i=1}^{n}f(\omega,x_{i})$?
+    \begin{equation}
+      \label{eq:dSGD}
+      \omega_{k+1} = \omega_{k} - \alpha_{k} \nabla_{\omega}f(\omega_{k},x_{k})
+    \end{equation}
+    The answer is yes! We just need a random variable $X$ of which sample space is $\{x_{i}\}_{i=1}^{n}$ and probability
+    distribution is uniform such that $p(X=x_{i})=1/n$. Now the original problem is converted to
+    \begin{equation*}
+      \min_{\omega} J(\omega) = \mathbb{E}[f(\omega,X)] = \frac{1}{n}\sum_{i=1}^{n}f(\omega,x_{i})
+    \end{equation*}
+    This conversion is not approximate but  strict. Now the equation (\ref{eq:dSGD}) is an SGD algorithm, and it will
+    converge if $x_{k}$ is independent and uniformly sampled from $\{x_{i}\}_{i=l}^{n}$. It should be noted that $x_{k}$ may
+    have the same value in different step because it is randomly picked from set $\{x_{i}\}_{i=1}^{n}$.  
