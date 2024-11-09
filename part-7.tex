@@ -24,6 +24,6 @@ Because\sn{$p(s'|a,s) \pi(a|s)=p(s',a|s)$, \\$\sum_{a}p(s',a|s)=p(s'|s)$}
 We should be familiar with this form and in previous chapter, many algorithms were applied to solve this problem. We will show that if we apply the Robbins-Monro algorithm, the TD algorithm can be obtained.
 For state $s_{t}$, we define a function as \sn{RM is a root-finding algorithm}
 \begin{equation*}
-    g(v_{\pi}(s_{t})) \triageq v_{\pi}(s_{t}) - \mathbb{E}[R_{t+1}+\gamma v_{\pi}(S_{t+1})|S_{t}=s_{t}]
+    g(v_{\pi}(s_{t})) \triangleq v_{\pi}(s_{t}) - \mathbb{E}[R_{t+1}+\gamma v_{\pi}(S_{t+1})|S_{t}=s_{t}]
 \end{equation*}
-Now we should find the $\tildeg(v_{\pi}(s_{t}))$. Since we can obtain 
+Now we should find the $\tilde{g}(v_{\pi}(s_{t}))$. Since we can obtain
