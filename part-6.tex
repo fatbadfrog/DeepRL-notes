@@ -129,26 +129,26 @@ replacing $k$ in \ref{ch6:2} is replaced with $\alpha$ results in the main algor
           ($\left|\omega_{1}-\omega^{*}\right|>b$), $\omega_{\infty}$ will never converge to $\omega^{*}$.
   \end{enumerate}
 
-\subsection{Application to mean estimation}
+  \subsection{Application to mean estimation}
 
-  Using RM algorithm to solve mean estimation, the key point is to find $\tilde{g}(\omega)$, which is
-  $\tilde{g}(\omega)=g(\omega)+\eta$. The $g(\omega)$ is obvious if the estimation problem is formulated to root-finding.
-  Since we want to find an $\omega$ equals to E[X], the $g(\omega)$ can be defined as:
-  \begin{equation*}
-    g(\omega) = \omega - E[X]
-  \end{equation*}
-  \par We know that $\tilde{g}(\omega)$ is $g(\omega)$ plus a noisy observation which is the difference between the
-  observation value of random variable X and E[X], so $\tilde{g}(\omega)$ can be defined as:
-  \begin{align*}
-    \tilde{g}(\omega) & = g(\omega) + \eta                                                            \\
-                      & = \omega - E[X] + \underbrace{\colorbox{myred!20!white}{$(E[X] - x)$}}_{\eta} \\
-                      & = \omega - x
-  \end{align*}
-  Now, we can use RM algorithm
-  \begin{equation*}
-    \omega_{k+1} = \omega_{k} - \alpha_{k}\tilde{g}(\omega_{k}) = \omega_{k} - \alpha_{k}(\omega_{k}-x_{k})
-  \end{equation*}
-  to find the root of $g(\omega)$ which is the E[X]. \sn{$\alpha_{k}$ can be set to $\frac{1}{k}$}
+    Using RM algorithm to solve mean estimation, the key point is to find $\tilde{g}(\omega)$, which is
+    $\tilde{g}(\omega)=g(\omega)+\eta$. The $g(\omega)$ is obvious if the estimation problem is formulated to root-finding.
+    Since we want to find an $\omega$ equals to E[X], the $g(\omega)$ can be defined as:
+    \begin{equation*}
+      g(\omega) = \omega - E[X]
+    \end{equation*}
+    \par We know that $\tilde{g}(\omega)$ is $g(\omega)$ plus a noisy observation which is the difference between the
+    observation value of random variable X and E[X], so $\tilde{g}(\omega)$ can be defined as:
+    \begin{align*}
+      \tilde{g}(\omega) & = g(\omega) + \eta                                                            \\
+                        & = \omega - E[X] + \underbrace{\colorbox{myred!20!white}{$(E[X] - x)$}}_{\eta} \\
+                        & = \omega - x
+    \end{align*}
+    Now, we can use RM algorithm
+    \begin{equation*}
+      \omega_{k+1} = \omega_{k} - \alpha_{k}\tilde{g}(\omega_{k}) = \omega_{k} - \alpha_{k}(\omega_{k}-x_{k})
+    \end{equation*}
+    to find the root of $g(\omega)$ which is the E[X]. \sn{$\alpha_{k}$ can be set to $\frac{1}{k}$}
 
 \section{Dvoretzky's converge theorem}
 
@@ -226,99 +226,99 @@ replacing $k$ in \ref{ch6:2} is replaced with $\alpha$ results in the main algor
     we must have $\Delta_{k} \to 0$ almost surely.
   \end{proof}
 
-\subsection{Application to mean estimation}
+  \subsection{Application to mean estimation}
 
-  Since we have proved the convergence of Dvoretzky's theorem, the convergence of mean estimation method can be directly
-  proven.
-  \begin{proof}
-    Let $\omega^{*}=\mathbb{E}[X]$ then the mean estimation algorithm
-    $\omega_{k+1}=\omega_{k}+\alpha_{k}(x_{k}-\omega_{k})$ can be rewritten as
-    \begin{equation*}
-      \omega_{k+1}-\omega^{*} = \omega_{k}-\omega^{*} +\alpha_{k}(x_{k} - \omega^{*} + \omega^{*} -\omega_{k})
-    \end{equation*}
-    Then if we define $\Delta_k=\omega_{k} - \omega^{*}$, we will get the Dvoretzky's theorem form:
-    \begin{equation*}
-      \Delta_{k+1} = (1-\alpha)\Delta_{k} + \alpha_{k}\underbrace{(x_{k}-\omega^{*})}_{\eta}
-    \end{equation*}
-    If we choose suitable $\alpha_{k}$, the convergence is only determined by $\mathbb{E}[\eta_{k}|\mathcal{H}_{k}]$ and
-    $\mathbb{E}[\eta_{k}^{2}|\mathcal{H}_{k}]$. So we can compute them and have
+    Since we have proved the convergence of Dvoretzky's theorem, the convergence of mean estimation method can be directly
+    proven.
+    \begin{proof}
+      Let $\omega^{*}=\mathbb{E}[X]$ then the mean estimation algorithm
+      $\omega_{k+1}=\omega_{k}+\alpha_{k}(x_{k}-\omega_{k})$ can be rewritten as
+      \begin{equation*}
+        \omega_{k+1}-\omega^{*} = \omega_{k}-\omega^{*} +\alpha_{k}(x_{k} - \omega^{*} + \omega^{*} -\omega_{k})
+      \end{equation*}
+      Then if we define $\Delta_k=\omega_{k} - \omega^{*}$, we will get the Dvoretzky's theorem form:
+      \begin{equation*}
+        \Delta_{k+1} = (1-\alpha)\Delta_{k} + \alpha_{k}\underbrace{(x_{k}-\omega^{*})}_{\eta}
+      \end{equation*}
+      If we choose suitable $\alpha_{k}$, the convergence is only determined by $\mathbb{E}[\eta_{k}|\mathcal{H}_{k}]$ and
+      $\mathbb{E}[\eta_{k}^{2}|\mathcal{H}_{k}]$. So we can compute them and have
+      \begin{align*}
+        \mathbb{E}[\eta_{k}|\mathcal{H}_{k}] & = \mathbb{E}[x_{k}|\mathcal{H}_{k}] - \mathbb{E}[\omega^{*}|\mathcal{H}_{k}]        \\
+                                             & = \mathbb{E}[x_{k}|\mathcal{H}_{k}] - \omega^{*} \quad (\{x_{k}\} \text{ is i.i.d}) \\
+                                             & = \mathbb{E}[X] - \omega^{*}                                                        \\
+                                             & = 0
+      \end{align*}
+      \begin{align*}
+        \mathbb{E}[\eta_{k}^{2}|\mathcal{H}_{k}] & = \mathbb{E}[x_{k}^{2}|\mathcal{H}_{k}] - 2\omega^{*}\times \mathbb{E}[x_{k}|\mathcal{H}_{k}]+\omega^{*2} \\
+                                                 & = \mathbb{E}[x_{k}]^{2} + Var[x_{k}] - \omega^{*2} \quad (\{x_{k}\} \text{ is i.i.d})                     \\
+                                                 & = Var[x_{k}]
+      \end{align*}
+      From above equations, we know that $\mathbb{E}[\eta_{k}|\mathcal{H}_{k}]=0$ and
+      $\mathbb{E}[\eta_{k}^{2}|\mathcal{H}_{k}] $ is bounded if $Var[x_{k}]$ is finite. So following Dvoretzky's theorem, we
+      can conclude $\Delta_{k}$ converges to zero and $\omega_{k}$ almost surely converge to $\omega^{*}=\mathbb{E}[X]$.
+    \end{proof}
+
+  \subsection{Application to RM algorithm}
+
+    The key point is to define $\Delta_{k}$. According to RM algorithm \sn{Remember RM is a root-finding algorithm and
+      $g(\omega^{*})=0$}, we can rewrite the iterative formula as:
     \begin{align*}
-      \mathbb{E}[\eta_{k}|\mathcal{H}_{k}] & = \mathbb{E}[x_{k}|\mathcal{H}_{k}] - \mathbb{E}[\omega^{*}|\mathcal{H}_{k}]        \\
-                                           & = \mathbb{E}[x_{k}|\mathcal{H}_{k}] - \omega^{*} \quad (\{x_{k}\} \text{ is i.i.d}) \\
-                                           & = \mathbb{E}[X] - \omega^{*}                                                        \\
-                                           & = 0
+      \omega_{k+1} - \omega^{*} & = \omega_{k} - \omega^{*} - a_{k}[g(\omega_{k})+\eta_{k}]                                                                      \\
+      \Delta_{k+1}              & = \Delta_{k} - a_{k}[g(\omega_{k})-g(\omega^{*})+\eta_{k}] \quad (\text{Define } \Delta_{k} \text{ as } \omega_{k}-\omega^{*})
     \end{align*}
+    According to mean value theorem, $g(\omega_{k})-g(\omega^{*})=\nabla_{\omega} g(\omega)(\omega_{k}-\omega^{*})$, we get
     \begin{align*}
-      \mathbb{E}[\eta_{k}^{2}|\mathcal{H}_{k}] & = \mathbb{E}[x_{k}^{2}|\mathcal{H}_{k}] - 2\omega^{*}\times \mathbb{E}[x_{k}|\mathcal{H}_{k}]+\omega^{*2} \\
-                                               & = \mathbb{E}[x_{k}]^{2} + Var[x_{k}] - \omega^{*2} \quad (\{x_{k}\} \text{ is i.i.d})                     \\
-                                               & = Var[x_{k}]
+      \Delta_{k+1} & = \Delta_{k} - a_{k}[\nabla_{\omega} g(\omega)(\omega_{k}-\omega^{*})+\eta_{k}]                                           \\
+                   & = (1-\underbrace{a_{k}\nabla_{\omega} g(\omega)}_{\colorbox{myyellow!80!myred}{$\alpha_{k}$}}) \Delta_{k} + a_{k}\eta_{k}
     \end{align*}
-    From above equations, we know that $\mathbb{E}[\eta_{k}|\mathcal{H}_{k}]=0$ and
-    $\mathbb{E}[\eta_{k}^{2}|\mathcal{H}_{k}] $ is bounded if $Var[x_{k}]$ is finite. So following Dvoretzky's theorem, we
-    can conclude $\Delta_{k}$ converges to zero and $\omega_{k}$ almost surely converge to $\omega^{*}=\mathbb{E}[X]$.
-  \end{proof}
+    As RM algorithm assumed, $0<c_{1}\le \nabla_{\omega} g(\omega) \le c_{2}$ is bounded, and since
+    $\sum_{k=1}^{\infty}a_{k}=\infty$ and $\sum_{k=1}^{\infty}a_{k}^{2}<\infty$, $\alpha_{k}$ satisfies the condition of
+    Dvoretzky's theorem. Thus, all conditions satisfy Dvoretzky's theorem requirements \sn {conditions of $\{\eta_{k}\}$ in
+      RM algorithm is as same as Dvoretzky's theorem} and hence $\Delta_{k}$ converges to zero which means that $\omega_{k}
+      \to \omega^{*}$ as $k\to \infty$.
 
-\subsection{Application to RM algorithm}
+  \subsection{An extension of Dvoretzky's theorem}
 
-  The key point is to define $\Delta_{k}$. According to RM algorithm \sn{Remember RM is a root-finding algorithm and
-    $g(\omega^{*})=0$}, we can rewrite the iterative formula as:
-  \begin{align*}
-    \omega_{k+1} - \omega^{*} & = \omega_{k} - \omega^{*} - a_{k}[g(\omega_{k})+\eta_{k}]                                                                      \\
-    \Delta_{k+1}              & = \Delta_{k} - a_{k}[g(\omega_{k})-g(\omega^{*})+\eta_{k}] \quad (\text{Define } \Delta_{k} \text{ as } \omega_{k}-\omega^{*})
-  \end{align*}
-  According to mean value theorem, $g(\omega_{k})-g(\omega^{*})=\nabla_{\omega} g(\omega)(\omega_{k}-\omega^{*})$, we get
-  \begin{align*}
-    \Delta_{k+1} & = \Delta_{k} - a_{k}[\nabla_{\omega} g(\omega)(\omega_{k}-\omega^{*})+\eta_{k}]                                           \\
-                 & = (1-\underbrace{a_{k}\nabla_{\omega} g(\omega)}_{\colorbox{myyellow!80!myred}{$\alpha_{k}$}}) \Delta_{k} + a_{k}\eta_{k}
-  \end{align*}
-  As RM algorithm assumed, $0<c_{1}\le \nabla_{\omega} g(\omega) \le c_{2}$ is bounded, and since
-  $\sum_{k=1}^{\infty}a_{k}=\infty$ and $\sum_{k=1}^{\infty}a_{k}^{2}<\infty$, $\alpha_{k}$ satisfies the condition of
-  Dvoretzky's theorem. Thus, all conditions satisfy Dvoretzky's theorem requirements \sn {conditions of $\{\eta_{k}\}$ in
-    RM algorithm is as same as Dvoretzky's theorem} and hence $\Delta_{k}$ converges to zero which means that $\omega_{k}
-    \to \omega^{*}$ as $k\to \infty$.
+    This is an extension of Dvoretzky's theorem for handling multiple variables and can be used to analyze the convergence
+    of Q-learning.
+    \begin{theorem}
+      Considering a finite set $\mathcal{S}$ of real numbers. For the stochastic process,
+      \begin{equation}
+        \label{eq:dvo-extension}
+        \Delta_{k+1}(s) = (1-\alpha_{k}(s)) \Delta_{k}(s) + \beta_{k}(s)\eta_{k}(s)
+      \end{equation}
+      it holds that $\Delta_{k}(s)$ converges to zero almost surely for every $s\in \mathcal{S}$ if the following conditions
+      are satisfied:
+      \begin{enumerate}[label=(\alph*)]
+        \item
+              $\sum_{k=1}^{\infty} \alpha_{k}(s)=\infty$, $\sum_{k=1}^{\infty} \alpha_{k}^{2}(s)<\infty$, $\sum_{k=1}^{\infty}
+                \beta_{k}^{2}(s)<\infty$, and $\mathbb{E}[\beta_{k}(s)|\mathcal{H}_{k}]\le
+                \mathbb{E}[\alpha_{k}(s)|\mathcal{H}_{k}]$ uniformly almost surely.
+        \item
+              $\Vert\mathbb{E}[\eta_{k}(s)|\mathcal{H}_{k}]\Vert_{\infty} \le \gamma\Vert \Delta_{k}\Vert_{\infty}$, where $\gamma
+                \in (0,1)$
+        \item
+              $var[\eta_{k}(s)|\mathcal{H}_{k}] \le C(1+\Vert \Delta_{k}(s)\Vert_{\infty})^{2}$, where $C$ is a constant.
+      \end{enumerate}
+      Here $\mathcal{H}_{k}=\{\Delta_{k}, \Delta_{k-1},\cdots,\eta_{k-1},\cdots,\alpha_{k-1},\cdots,\beta_{k-1},\cdots\}$
+      represents the historical information and $\Vert \cdot \Vert_{\infty}$ is maximum norm.
+    \end{theorem}
+    We do not prove this theorem and just give some remarks below
+    \begin{enumerate}
 
-\subsection{An extension of Dvoretzky's theorem}
-
-  This is an extension of Dvoretzky's theorem for handling multiple variables and can be used to analyze the convergence
-  of Q-learning.
-  \begin{theorem}
-    Considering a finite set $\mathcal{S}$ of real numbers. For the stochastic process,
-    \begin{equation}
-      \label{eq:dvo-extension}
-      \Delta_{k+1}(s) = (1-\alpha_{k}(s)) \Delta_{k}(s) + \beta_{k}(s)\eta_{k}(s)
-    \end{equation}
-    it holds that $\Delta_{k}(s)$ converges to zero almost surely for every $s\in \mathcal{S}$ if the following conditions
-    are satisfied:
-    \begin{enumerate}[label=(\alph*)]
       \item
-            $\sum_{k=1}^{\infty} \alpha_{k}(s)=\infty$, $\sum_{k=1}^{\infty} \alpha_{k}^{2}(s)<\infty$, $\sum_{k=1}^{\infty}
-              \beta_{k}^{2}(s)<\infty$, and $\mathbb{E}[\beta_{k}(s)|\mathcal{H}_{k}]\le
-              \mathbb{E}[\alpha_{k}(s)|\mathcal{H}_{k}]$ uniformly almost surely.
+            The variables $s$ can be reviewed as index. In the context of reinforcement learning, it indicates the state or the
+            state-action pair. The maximum norm $\Vert \cdot \Vert_{\infty}$ is defined over set, which means
+            $\Vert\mathbb{E}[\eta_{k}(s)|\mathcal{H}_{k}]\Vert_{\infty}=\max_{s\in
+                \mathcal{S}}\left|\mathbb{E}[\eta_{k}(s)|\mathcal{H}_{k}]\right|$
       \item
-            $\Vert\mathbb{E}[\eta_{k}(s)|\mathcal{H}_{k}]\Vert_{\infty} \le \gamma\Vert \Delta_{k}\Vert_{\infty}$, where $\gamma
-              \in (0,1)$
+            This theorem can handle the reinforcement learning problem with multiple states because it uses $\Vert \cdot
+              \Vert_{\infty}$. It only requires the expectation and variance of $\eta_{k}(s)$ is bounded by $\Delta_{k}(s)$.
       \item
-            $var[\eta_{k}(s)|\mathcal{H}_{k}] \le C(1+\Vert \Delta_{k}(s)\Vert_{\infty})^{2}$, where $C$ is a constant.
+            Convergence of $\Delta_{k}(s)$ for all $s\in \mathcal{S}$ requires that the conditions are valid for all $s \in
+              \mathcal{S}$, that is for all states or state-cation pairs.
+
     \end{enumerate}
-    Here $\mathcal{H}_{k}=\{\Delta_{k}, \Delta_{k-1},\cdots,\eta_{k-1},\cdots,\alpha_{k-1},\cdots,\beta_{k-1},\cdots\}$
-    represents the historical information and $\Vert \cdot \Vert_{\infty}$ is maximum norm.
-  \end{theorem}
-  We do not prove this theorem and just give some remarks below
-  \begin{enumerate}
-
-    \item
-          The variables $s$ can be reviewed as index. In the context of reinforcement learning, it indicates the state or the
-          state-action pair. The maximum norm $\Vert \cdot \Vert_{\infty}$ is defined over set, which means
-          $\Vert\mathbb{E}[\eta_{k}(s)|\mathcal{H}_{k}]\Vert_{\infty}=\max_{s\in
-              \mathcal{S}}\left|\mathbb{E}[\eta_{k}(s)|\mathcal{H}_{k}]\right|$
-    \item
-          This theorem can handle the reinforcement learning problem with multiple states because it uses $\Vert \cdot
-            \Vert_{\infty}$. It only requires the expectation and variance of $\eta_{k}(s)$ is bounded by $\Delta_{k}(s)$.
-    \item
-          Convergence of $\Delta_{k}(s)$ for all $s\in \mathcal{S}$ requires that the conditions are valid for all $s \in
-            \mathcal{S}$, that is for all states or state-cation pairs.
-
-  \end{enumerate}
 
 \section{Stochastic gradient descent}
 
@@ -485,4 +485,4 @@ replacing $k$ in \ref{ch6:2} is replaced with $\alpha$ results in the main algor
     \end{equation*}
     This conversion is not approximate but  strict. Now the equation (\ref{eq:dSGD}) is an SGD algorithm, and it will
     converge if $x_{k}$ is independent and uniformly sampled from $\{x_{i}\}_{i=l}^{n}$. It should be noted that $x_{k}$ may
-    have the same value in different step because it is randomly picked from set $\{x_{i}\}_{i=1}^{n}$.  
+    have the same value in different step because it is randomly picked from set $\{x_{i}\}_{i=1}^{n}$.

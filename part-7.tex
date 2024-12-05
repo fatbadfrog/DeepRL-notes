@@ -1,29 +1,51 @@
-\part{Temporal-Difference Method} Temporal-Difference(TD) is an important method for reinforcement learning. Like MC, it
-is a model-free method but has advantage for its incremental form. In fact, TD is a special stochastic algorithm for
-solving Bellman equation or Bellman optimality equation.
+\part{Temporal-Difference Method} Temporal-Difference(TD) is an important method for reinforcement learning. Like MC, it is a model-free method but has
+advantage for its incremental form. In fact, TD is a special stochastic algorithm for solving Bellman equation or Bellman optimality equation.
 
 \section{TD learning of state values}
-We firstly introduce the most basic TD algorithm, which can estimate the state-values of a given policy.
- \subsection{Algorithm description}
- Suppose that we have some experience samples $(s_{0},r_{1},s_{1},\cdots,s_{t},r_{t+1},s_{t+},\cdots,)$ generated following $\pi$. Here t denotes the time step. The following algorithm can 
-estimate the state value:
-\begin{align}\label{eq:TD-value}
-  v_{t+1}(s_{t}) &= v_{t}(s_{t}) - \alpha_{t}\left[v_{t}(s_{t})-\left(r_{t+1}+\gamma v_{t}(s_{t+1})\right)\right], \\
-  v_{t+1}(s) &= v_{t}(s), for \text{ for all }  s\neq s_{t}
-\end{align}
-where $t=0,1,2,\cdots,$ Here, $v_{t}(s_{t})$ is the estimation of $v_{\pi}$ at time t; $\alpha_{t}(s_{t})$ is the learning rate for $s_{t}$ at time t.
-From \ref{eq:TD-value}, at time t only the value of visited state ($s_{t}$) is updated. The values of the unvisited states $s\neq s_{t}$ remains unchanged.
-Why TD can be designed like equation (\ref{eq:TD-value})? In fact, it can be viewed as a special stochastic for solving the Bellman equation. We know that the definition of the state value is an expectation:
-\begin{equation*}
-    v_{\pi}(s) = \mathbb{E}\left[R_{t+1}+\gamma G_{t+1}|S_{t}=s\right], s\in S
-\end{equation*}
-Because\sn{$p(s'|a,s) \pi(a|s)=p(s',a|s)$, \\$\sum_{a}p(s',a|s)=p(s'|s)$}
-\begin{equation*}
-    \mathbb{E}\left[G_{t+1}|S_{t}=s\right] = \sum_{a} \pi(a|s)\sum_{s'}p(s'|s,a)v_{\pi}(s') = \sum_{s'}p(s'|s)v_{\pi}(s') = \mathbb{E}[v_{\pi}(S_{t+1})|S_{t}=s]
-\end{equation*}
-We should be familiar with this form and in previous chapter, many algorithms were applied to solve this problem. We will show that if we apply the Robbins-Monro algorithm, the TD algorithm can be obtained.
-For state $s_{t}$, we define a function as \sn{RM is a root-finding algorithm}
-\begin{equation*}
-    g(v_{\pi}(s_{t})) \triangleq v_{\pi}(s_{t}) - \mathbb{E}[R_{t+1}+\gamma v_{\pi}(S_{t+1})|S_{t}=s_{t}]
-\end{equation*}
-Now we should find the $\tilde{g}(v_{\pi}(s_{t}))$. Since we can obtain
+
+  We firstly introduce the most basic TD algorithm, which can estimate the state-values of a given policy.
+
+  \subsection{Algorithm description}
+
+    Suppose that we have some experience samples $(s_{0},r_{1},s_{1},\cdots,s_{t},r_{t+1},s_{t+},\cdots,)$ generated following $\pi$. Here t denotes the time
+    step. The following algorithm can estimate the state value:
+    \begin{align}
+      \label{eq:TD-value}
+      V_{t+1}(s_{t}) & = V_{t}(s_{t}) - \alpha_{t}\left[V_{t}(s_{t})-\left(r_{t+1}+\gamma V_{t}(s_{t+1})\right)\right], \\
+      V_{t+1}(s)     & = V_{t}(s), for \text{ for all } s\neq s_{t}
+    \end{align}
+    where $t=0,1,2,\cdots,$ Here, $V_{t}(s_{t})$ is the estimation of $V_{\pi}$ at time t; $\alpha_{t}(s_{t})$ is the learning rate for $s_{t}$ at time t. From
+    \ref{eq:TD-value}, at time t only the value of visited state ($s_{t}$) is updated. The values of the unvisited states $s\neq s_{t}$ remains unchanged. Why
+    TD can be designed like equation (\ref{eq:TD-value})? In fact, it can be viewed as a special stochastic for solving the Bellman equation. We know that the
+    definition of the state value is an expectation:
+    \begin{equation*}
+      V_{\pi}(s) = \mathbb{E}\left[R_{t+1}+\gamma G_{t+1}|S_{t}=s\right], s\in S
+    \end{equation*}
+    Because\sn{$p(s'|a,s) \pi(a|s)=p(s',a|s)$, \\$\sum_{a}p(s',a|s)=p(s'|s)$}
+    \begin{equation*}
+      \mathbb{E}\left[G_{t+1}|S_{t}=s\right] = \sum_{a} \pi(a|s)\sum_{s'}p(s'|s,a)v_{\pi}(s') = \sum_{s'}p(s'|s)v_{\pi}(s') =
+      \mathbb{E}[V_{\pi}(S_{t+1})|S_{t}=s]
+    \end{equation*}
+    Then we can obtain the Bellman expectation equation
+    \begin{equation}
+      \label{eq:Bellman-expectation}
+      V_{\pi}(s) = \mathbb{E}[R_{t+1}+\gamma V_{\pi}(S_{t+1})|S_{t}=s], s\in S
+    \end{equation}
+    We should be familiar with this form and in previous chapter, many algorithms were applied to solve this problem. We will show that if we apply the
+    Robbins-Monro algorithm, the TD algorithm can be obtained. For state $s_{t}$, we define a function as
+    \begin{equation*}
+      g(V(s_{t})) \triangleq V(s_{t}) - \mathbb{E}[R_{t+1}+\gamma V_{\pi}(S_{t+1})|S_{t}=s_{t}]
+    \end{equation*}
+    Obviously, $V_{\pi}(s_{t})$ is the root of $g(V(s_{t}))$\sn{RM is a root-finding algorithm}. Now we should find the $\tilde{g}(V_(s_{t}))$. Since we can
+    obtain $r_{t+1}$ and $s_{t+1}$, which are samples of $R_{t+1}$ and $S_{t+1}$, the noisy observation $\tilde{g}(V_{s_{t}})$ is:
+    \begin{align*}
+      \tilde{g}(V_{s_{t}}) & = g(V_{s_{t}}) + \eta                                                                                                                                                                     \\
+                           & = V(s_{t}) - \mathbb{E}[R_{t+1}+\gamma V_{\pi}(S_{t+1})|S_{t}=s_{t}] + \left(\mathbb{E}[R_{t+1}+\gamma V_{\pi}(S_{t+1})|S_{t}=s_{t}]-\left[r_{t+1}+\gamma V_{\pi}(s_{t+1})\right] \right) \\
+                           & = V(s_{t}) -\left[r_{t+1}+\gamma V_{\pi}(s_{t+1})\right] \\
+    \end{align*}
+    Therefore, the Robbins-Monro algorithm is:
+    \begin{align}\label{eq:TD-RM}
+      V_{t+1}(s_{t}) &= V_{s_{t}} - \alpha\tilde{g}(V_{s_{t}}) \\
+                     &= V \\
+    \end{align}
+
