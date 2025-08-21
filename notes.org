@@ -1,0 +1,121 @@
+#+STARTUP content indent
+#+header: :result output
+#+header: :cmdline -std=c++17 -Wall
+* Effective Modern C++
+** 模板的类型推导
+考虑如下函数模板, 
+#+BEGIN_SRC  cpp
+  template<typename T>
+  void f(ParaType param);
+  f(expr)
+#+END_SRC
+*** ParamType 是个指针或引用
+:PROPERTIES:
+:CUSTOM_ID: paraIsRef
+:END:
+1. 如果expr带有引用，先将引用忽略；
+2. 对expr的类型和ParaType进行类型匹配，例如：
+#+BEGIN_SRC cpp
+  // Function protype
+  template<type T> void f(T& param);
+
+  int x = 5;
+  const int cx = 5;
+  const int& crx = cx;
+
+  f(x);  // T=>int (type of x), param=>int&
+  f(cx); // T=>const int (type of cx), param=>const int&
+  f(crx); // T=>const int (type of crx after ignoring reference), param=>const int&
+
+  // Now change T& to const T&
+  template<type T> void f(const T& param);
+  f(x); // T=>int (type of x), param=>const int&
+  f(cx); // T=>int (type of cx but do not need const), param=>const int&
+  f(crx); // T=>int (type of crx after ignoring reference, also do not need const), param=>const int&
+
+  //The same to T*
+  template<type T> void f(T* param);
+  int x = 5;
+  const int* px = 5;
+
+  f(&x); //T=>int (type of x), param=>int*
+  f(px); //T=>const int (type of px after removing pointer), param=>const int*
+#+END_SRC
+*** ParamType是个万能引用(T&&)
+1. 如果expr是个左值，T和param都会被解析成左值引用
+2. 如果expr是右值，将右值看作对应类型不带引用的变量，应用[[#paraIsRef][规则1]]
+   #+BEGIN_SRC cpp
+  template<type T>void f(T&& param);
+
+  int x = 27;
+  const int cx = x;
+  const int& crx = x;
+
+  f(x); //T=>int& param=>int&
+  f(cx); //T=>const int& param=>const int&
+  f(crx); //T=>const int& param=>const int& (rember removing reference)
+
+  // right value
+  f(27); //27 is a right value and its type is int. T=>int(type of 27), param=>int&& 
+   #+END_SRC
+*** ParamType既非引用也非指针（按值传递）
+因为T是一个新的对象，所以忽略传入参数的const和引用属性
+#+BEGIN_SRC cpp
+  template<typename T>void f(T param);
+
+  int x = 27;
+  const int cx = x;
+  const int& crx = x;
+
+  f(x); // param and T are int
+  f(cx); // param and T are int (ignore const)
+  f(crx); // param and T are int (ignore const and reference)
+#+END_SRC
+如果传入参数是一个指向const对象的const指针，指针本身的const属性忽略，但指向对象的const属性不忽略
+#+BEGIN_SRC  cpp
+  const char* ptr const = "Hi";
+  f(ptr) // param and T are const char*
+#+END_SRC
+我们知道，数组和指针是可以互换的，所以按值传递数组时，会解析成指向数组对象的指针
+#+BEGIN_SRC cpp
+  const char name[] = "J. P. Briggs";
+  f(name)  // T is const char*
+#+END_SRC
+难点来了，如果是按引用传递，T会被解析成实际的数组类型，这个类型会包含数组尺寸，传入的形参则会被解析成type (&)[size]，例如：
+#+BEGIN_SRC cpp
+  template<typename T>void f(T& param);
+  const char name[] = "J. P. Briggs";
+  f(name) // T=>const char[13], name=> const char (&)[13]
+#+END_SRC
+利用这个特性，我们可以创造一个推断数组元素个数的模版，加上constexpr，可以实现用一个数组的大小去初始化另一个数组；
+#+BEGIN_SRC cpp
+  #include <iostream>
+  template<typename T>
+  constexpr std::size_t arraySize(T& param) //param is deduced as T (&)[N] and std::size can be appiled to get its size
+  {return std::size(param);}
+
+  int main()
+  {
+    const char name[] = "wanghui";
+    int mappedValues[arraySize(name)];
+    std::cout << "Size of name and mappedValues is " << arraySize(name);
+    return 0;
+  }
+#+END_SRC
+
+#+RESULTS:
+: Size of name and mappedValues is 8
+
+函数形参和数组一样，按值传递时，param是一个函数指针；按引用传递时，param则被推导成函数引用
+#+BEGIN_SRC cpp
+  void someFunc(int, double);
+
+  template<typename T>void f1(T param);
+  template<typename T>void f2(T& param);
+
+  f1(someFunc);  // param => void (*) (int, double)
+  f2(someFunc);  // param => void (&) (int, double)
+
+
+#+END_SRC
+** auto的类型推导
