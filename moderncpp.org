@@ -1,0 +1,201 @@
+#+STARTUP: indent content
+#+header: :result output
+#+header: :cmdline -std=c++17 -Wall
+* Effective Modern C++
+
+** 模板的类型推导
+
+考虑如下函数模板,
+
+#+BEGIN_SRC cpp
+template<typename T>
+void f(ParamType param); //ParamType 可以是T, T&, T*, const T,...
+f(expr)
+#+END_SRC
+
+<<paraIsRef>>
+*** ParamType 是个指针或引用
+
+1.  如果expr带有引用，先将引用忽略；
+2.  对expr的类型和ParaType进行类型匹配，例如：
+   #+BEGIN_SRC cpp
+   // Function protype
+   template<type T> void f(T& param);
+   
+   int x = 5;
+   const int cx = 5;
+   const int& crx = cx;
+   
+   f(x);  // T=>int (type of x), param=>int&
+   f(cx); // T=>const int (type of cx), param=>const int&
+   f(crx); // T=>const int (type of crx after ignoring reference), param=>const int&
+   
+   // Now change T& to const T&
+   template<type T> void f(const T& param);
+   f(x); // T=>int (type of x), param=>const int&
+   f(cx); // T=>int (type of cx but do not need const), param=>const int&
+   f(crx); // T=>int (type of crx after ignoring reference, also do not need const), param=>const int&
+   
+   //The same to T*
+   template<type T> void f(T* param);
+   int x = 5;
+   const int* px = 5;
+   
+   f(&x); //T=>int (type of x), param=>int*
+   f(px); //T=>const int (type of px after removing pointer), param=>const int*
+   #+END_SRC
+
+*** ParamType是个万能引用(T&&)
+
+1.  如果expr是个左值，T 和 param 都会被解析成左值引用
+2.  如果expr是右值，将右值看作对应类型不带引用的变量，应用[[#paraIsRef][规则1]]
+   #+BEGIN_SRC cpp
+   template<type T>void f(T&& param);
+   
+   int x = 27;
+   const int cx = x;
+   const int& crx = x;
+   
+   f(x); //T=>int& param=>int&
+   f(cx); //T=>const int& param=>const int&
+   f(crx); //T=>const int& param=>const int& (rember removing reference)
+   
+   // right value
+   f(27); //27 is a right value and its type is int. T=>int(type of 27), param=>int&&
+   #+END_SRC
+
+*** ParamType既非引用也非指针（按值传递）
+
+1.  因为 T 是一个新的对象，所以忽略传入参数的 const 和引用属性
+    #+BEGIN_SRC cpp
+    template<typename T>void f(T param);
+    
+    int x = 27;
+    const int cx = x;
+    const int& crx = x;
+    
+    f(x); // param and T are int
+    f(cx); // param and T are int (ignore const)
+    f(crx); // param and T are int (ignore const and reference)
+    #+END_SRC
+2.  如果传入参数是一个指向const对象的const指针，指针本身的 const 属性忽略，但指向对象的 const 属性不忽略
+    #+BEGIN_SRC cpp
+    const char* ptr const = "Hi";
+    f(ptr) // param and T are const char*
+    #+END_SRC
+3.  我们知道，数组和指针是可以互换的，所以按值传递数组时，会解析成指向数组对象的指针
+    #+BEGIN_SRC cpp
+    const char name[] = "J. P. Briggs";
+    f(name)  // T is const char*
+    #+END_SRC
+4.  难点来了，如果是按引用传递，T 会被解析成实际的数组类型，这个类型会包含数组尺寸，传入的形参则会被解析成 ~type (&)[size]~ ，例如：
+    #+BEGIN_SRC cpp
+    template<typename T>void f(T& param);
+    const char name[] = "J. P. Briggs";
+    f(name) // T=>const char[13], name=> const char (&)[13]
+    #+END_SRC
+
+   利用这个特性，我们可以创造一个推断数组元素个数的模版，加上 constexpr ，可以实现用一个数组的大小去初始化另一个数组；
+   #+BEGIN_SRC cpp
+   #include <iostream>
+   template<typename T>
+   constexpr std::size_t arraySize(T& param) //param is deduced as T (&)[N] and std::size can be appiled to get its size
+   {return std::size(param);}
+   
+   int main()
+   {
+     const char name[] = "wanghui";
+     int mappedValues[arraySize(name)];
+     std::cout << "Size of name and mappedValues is " << arraySize(name);
+     return 0;
+   }
+   #+END_SRC
+
+   #+RESULTS:
+   : Size of name and mappedValues is 8
+
+   函数形参和数组一样，按值传递时，param是一个函数指针；按引用传递时，param则被推导成函数引用
+   #+BEGIN_SRC cpp
+   void someFunc(int, double);
+   
+   template<typename T>void f1(T param);
+   template<typename T>void f2(T& param);
+   
+   f1(someFunc);  // param => void (*) (int, double)
+   f2(someFunc);  // param => void (&) (int, double)
+   #+END_SRC
+
+   #+RESULTS:
+
+** auto的类型推导
+
+1.  auto 类型的推导与模版的类型推导是一致的，auto 扮演的是模版中 T 的角色，比如:
+   #+BEGIN_SRC cpp
+   auto x = 27;
+   
+   // 可看作一个模版函数, ParamType既不是指针，也不是引用
+   template<typename T>void deduce_for_x(T param); 
+   deuce_for_x(27);
+   // 所以T是int, 并且auto<=>T, 所以auto就是int
+   #+END_SRC
+
+2.  如果有 const 等修饰，跟模版一样，忽略修饰词后推导 T ，比如：
+   #+BEGIN_SRC cpp
+   const auto cx = x;
+   // 同样将auto转化成模版函数，注意带上const
+   template<typename T>void deduce_for_cx(const T param);
+   deduce_for_cx(x);
+   // 忽略const后，T是int, 所以auto依然是int 
+   #+END_SRC
+
+3.  类似地，如果有引用，将引用忽略后推导 T ，比如：
+   #+BEGIN_SRC cpp
+   const auto& rcx = x;
+   // auto转换成模版
+   template<typename T>void deduce_for_rcx(const T& param);
+   deduce_for_rcx(x);
+   // 忽略引用和const后，auto依然是int
+   #+END_SRC
+
+4.  万能引用根据传入参数是左值还是右值进行 T 推导：
+   #+BEGIN_SRC cpp
+   auto&& uref1 = x; //x是int左值，uref1被解析成引用，即int&
+   auto&& uref2 = cx; //cx是const int左值，uref2被解析成const int&
+   auto&& uref3 = 27; //27是int右值，uref3被解析成int&&
+   #+END_SRC
+   
+5.  数组和函数作形参，根据传值还是引用，分别解析成指针和数组类型：
+   #+BEGIN_SRC cpp
+   const char Name[] = "wanghui";
+   auto arr1 = Name;  //传值，arr1是const char*
+   auto& arr2 = Name; //引用，arr2是const char (&)[];
+   #+END_SRC
+*** auto与模版推导的不同
+C++11后，初始化有4种：
+   
+   #+BEGIN_SRC cpp
+   int x1 = 27;
+   int x2(27);
+   int x3{27};
+   int x4 = {27}；
+   #+END_SRC
+   这4种最后都会得到一个int的27，但是将int替换成 auto 后，后两种大括号形式的初始化会产生一个list，这个list含有单个元素27，auto 被认为是 std::initializer_list<int> 。所以，如果大括号中元素类型不一致，会导致初始化失败，比如：
+   #+BEGIN_SRC cpp
+   auto x5 = {1,2,3.0}; //类型不一致，初始化失败；
+   #+END_SRC
+   另外，用大括号初始化的变量作为模版函数的形参会导致 T 推导失败，需要显式指定类型：
+   #+BEGIN_SRC cpp
+   auto x6 = {1,2,3};
+   template<typename T>void f(T param);
+   f(x6); //编译不通过，T不能被推导
+   
+   template<typename T>void f_fixed(std::initializer_list<T> param);
+   f_fixed(x6); //ok
+   #+END_SRC
+   最后一点，auto 作为函数返回类型时，函数不能返回大括号括起的初始化表达式：
+   #+BEGIN_SRC cpp
+   auto createInitList ()
+   {
+       return {1,2,3}; //错误，auto不能完成推导
+   }
+   #+END_SRC
